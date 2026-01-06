@@ -127,3 +127,49 @@ a:hover {
   animation: slide-in-bottom 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 }
 
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .section-padding {
+    padding: 40px 0;
+  }
+
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.75rem; }
+  h3 { font-size: 1.5rem; }
+
+  .navbar-brand img {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+
+/* Hero Carousel Mobile Adjustments */
+.hero-carousel-item {
+  position: relative;
+  height: 600px;
+}
+
+@media (max-width: 768px) {
+  .hero-carousel-item {
+    height: 400px; /* Smaller height for mobile */
+  }
+  
+  /* Adjust caption positioning for mobile */
+  .carousel-caption {
+    width: 80% !important;
+    left: 10% !important;
+    padding-bottom: 20px !important;
+  }
+  
+  .carousel-caption h1 {
+    font-size: 1.8rem !important;
+  }
+  
+  .carousel-caption p {
+    font-size: 0.9rem !important;
+    margin-bottom: 15px !important;
+  }
+}
+

@@ -7,7 +7,7 @@ function HeroCarousel() {
     <Carousel fade>
       {/* Slide 1 */}
       <Carousel.Item>
-        <div style={{ position: 'relative', height: '600px' }}>
+        <div className="hero-carousel-item">
           <div
             style={{
               position: 'absolute',
@@ -35,7 +35,7 @@ function HeroCarousel() {
 
       {/* Slide 2 */}
       <Carousel.Item>
-        <div style={{ position: 'relative', height: '600px', backgroundColor: '#333' }}>
+        <div className="hero-carousel-item" style={{ backgroundColor: '#333' }}>
           {/* Fallback pattern background if no image */}
           <div style={{
             height: '100%',
