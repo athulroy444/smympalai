@@ -6,27 +6,23 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import PageHeader from '../components/common/PageHeader';
+import { useData } from '../context/DataContext';
 
 function Forona() {
+    const { foronaList } = useData();
     const [selectedForona, setSelectedForona] = useState('');
     const [selectedUnit, setSelectedUnit] = useState('');
     const [showDetails, setShowDetails] = useState(false);
 
-    // Mock Data - Typically this would come from an API
-    const foronaList = [
-        { name: "Pala", units: ["Cathedral", "Lalam", "Kadanad", "Pravithanam"] },
-        { name: "Erattupetta", units: ["Aruvithura", "Poonjar", "Thidanad", "Erattupetta"] },
-        { name: "Kuravilangad", units: ["Kuravilangad", "Kalathoor", "Mannara", "Uzhavoor"] },
-        { name: "Ramapuram", units: ["Ramapuram", "Koodappulam", "Vellilappilly", "Kurinji"] },
-        { name: "Cherpunkal", units: ["Cherpunkal", "Kidangoor", "Ayarkunnam", "Punnathura"] },
-        { name: "Kaduthuruthy", units: ["Kaduthuruthy", "Muttuchira", "Neezhoor", "Manjoor"] },
-        { name: "Aruvithura", units: ["Aruvithura", "Kondadu", "Peringalam"] },
-        { name: "Athirampuzha", units: ["Athirampuzha", "Ettumanoor", "Sreekanda", "Parampuzha"] }
-    ];
+    const currentForonaData = selectedForona
+        ? foronaList.find(f => f.name === selectedForona)
+        : null;
 
-    const currentUnits = selectedForona
-        ? foronaList.find(f => f.name === selectedForona)?.units || []
-        : [];
+    const currentUnits = currentForonaData?.units || [];
+
+    const currentUnitData = selectedUnit
+        ? currentUnits.find(u => u.name === selectedUnit)
+        : null;
 
     const handleForonaChange = (e) => {
         setSelectedForona(e.target.value);
@@ -70,6 +66,20 @@ function Forona() {
                                         </Form.Select>
                                     </Form.Group>
 
+                                    {/* Display Forona Executives if Forona is selected */}
+                                    {currentForonaData?.executives?.length > 0 && (
+                                        <div className="mb-4 p-3 bg-light rounded border">
+                                            <h6 className="text-primary mb-2">Forona Executives</h6>
+                                            <ul className="list-unstyled mb-0">
+                                                {currentForonaData.executives.map((exec, idx) => (
+                                                    <li key={idx} className="small">
+                                                        <strong>{exec.name}</strong> - <span className="text-muted">{exec.post}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
                                     <Form.Group className="mb-4">
                                         <Form.Label className="fw-bold text-muted">Select Unit</Form.Label>
                                         <Form.Select
@@ -80,7 +90,7 @@ function Forona() {
                                         >
                                             <option value="">-- Choose Unit --</option>
                                             {currentUnits.map((u, idx) => (
-                                                <option key={idx} value={u}>{u}</option>
+                                                <option key={idx} value={u.name}>{u.name}</option>
                                             ))}
                                         </Form.Select>
                                     </Form.Group>
@@ -107,22 +117,47 @@ function Forona() {
                     </Col>
                 </Row>
 
-                {showDetails && (
+                {showDetails && currentUnitData && (
                     <Row className="mt-5 justify-content-center fade-in-up">
                         <Col md={10}>
                             <Card className="shadow border-0">
                                 <Card.Header className="bg-white border-bottom-0 pt-4 pb-0 text-center">
-                                    <h2 style={{ color: '#E14B1F' }}>{selectedUnit} Unit</h2>
+                                    <h2 style={{ color: '#E14B1F' }}>{currentUnitData.name} Unit</h2>
                                     <p className="text-muted">{selectedForona} Forona</p>
                                 </Card.Header>
-                                <Card.Body className="p-5 text-center">
-                                    <div className="p-4 bg-light rounded mb-3">
-                                        <p className="mb-0 fs-5 text-secondary">
-                                            Here you can display specific details about the <strong>{selectedUnit}</strong> unit,
-                                            such as upcoming events, unit members, or gallery photos specific to this unit.
-                                        </p>
+                                <Card.Body className="p-5">
+                                    <div className="text-center mb-4">
+                                        <div className="p-4 bg-light rounded mb-3">
+                                            <p className="mb-0 fs-5 text-secondary">
+                                                Specific details about the <strong>{currentUnitData.name}</strong> unit.
+                                            </p>
+                                        </div>
                                     </div>
-                                    <Button variant="outline-dark" size="sm">Coming Soon</Button>
+
+                                    {/* Display Unit Executives */}
+                                    {currentUnitData.executives?.length > 0 ? (
+                                        <div className="mb-4">
+                                            <h4 className="text-center mb-4 border-bottom pb-2">Unit Executives</h4>
+                                            <Row className="justify-content-center">
+                                                {currentUnitData.executives.map((exec, idx) => (
+                                                    <Col key={idx} md={4} sm={6} className="mb-3">
+                                                        <Card className="h-100 border-0 shadow-sm text-center bg-light">
+                                                            <Card.Body>
+                                                                <Card.Title className="h6">{exec.name}</Card.Title>
+                                                                <Card.Subtitle className="mb-2 text-muted small">{exec.post}</Card.Subtitle>
+                                                            </Card.Body>
+                                                        </Card>
+                                                    </Col>
+                                                ))}
+                                            </Row>
+                                        </div>
+                                    ) : (
+                                        <p className="text-center text-muted">No executives listed for this unit.</p>
+                                    )}
+
+                                    <div className="text-center mt-4">
+                                        <Button variant="outline-dark" size="sm">Coming Soon</Button>
+                                    </div>
                                 </Card.Body>
                             </Card>
                         </Col>

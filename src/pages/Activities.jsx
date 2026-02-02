@@ -5,24 +5,18 @@ import Card from 'react-bootstrap/Card';
 import PageHeader from '../components/common/PageHeader';
 import { CalendarEvent, People, Heart } from 'react-bootstrap-icons';
 
+import { useData } from '../context/DataContext';
+
 function Activities() {
-    const activities = [
-        {
-            title: "Youth Camps",
-            icon: <People size={30} />,
-            desc: "Annual leadership and spiritual camps designed to mold the character of our youth."
-        },
-        {
-            title: "Social Service",
-            icon: <Heart size={30} />,
-            desc: "Charity drives, blood donation camps, and housing projects for the needy."
-        },
-        {
-            title: "Cultural Events",
-            icon: <CalendarEvent size={30} />,
-            desc: "Arts festivals and sports tournaments to foster unity and talent."
-        }
-    ];
+    const { activities } = useData();
+
+    // Map icon names to components if needed, or just use defaults for now
+    // For simplicity, we'll re-use the same icons or switch based on name
+    const getIcon = (iconName) => {
+        if (iconName === 'Heart') return <Heart size={30} />;
+        if (iconName === 'CalendarEvent') return <CalendarEvent size={30} />;
+        return <People size={30} />; // Default
+    };
 
     return (
         <>
@@ -30,17 +24,21 @@ function Activities() {
 
             <Container className="py-5">
                 <Row>
-                    {activities.map((act, idx) => (
-                        <Col key={idx} md={4} className="mb-4">
-                            <Card className="h-100 border-0 shadow-sm text-center p-4">
-                                <Card.Body>
-                                    <div className="text-primary mb-3">{act.icon}</div>
-                                    <Card.Title className="fw-bold mb-3">{act.title}</Card.Title>
-                                    <Card.Text className="text-muted">{act.desc}</Card.Text>
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    ))}
+                    {activities.length === 0 ? (
+                        <div className="text-center">Loading activities or none found...</div>
+                    ) : (
+                        activities.map((act, idx) => (
+                            <Col key={idx} md={4} className="mb-4">
+                                <Card className="h-100 border-0 shadow-sm text-center p-4">
+                                    <Card.Body>
+                                        <div className="text-primary mb-3">{getIcon(act.icon_name)}</div>
+                                        <Card.Title className="fw-bold mb-3">{act.title}</Card.Title>
+                                        <Card.Text className="text-muted">{act.description}</Card.Text>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        ))
+                    )}
                 </Row>
             </Container>
         </>

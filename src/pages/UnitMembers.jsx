@@ -16,7 +16,8 @@ function UnitMembers() {
         fullName: '',
         dob: '',
         houseName: '',
-        phone: ''
+        phone: '',
+        post: ''
     });
 
     const handleInputChange = (e) => {
@@ -30,7 +31,7 @@ function UnitMembers() {
     const handleSubmit = (e) => {
         e.preventDefault();
         setMembers([...members, { ...formData, id: Date.now() }]);
-        setFormData({ fullName: '', dob: '', houseName: '', phone: '' });
+        setFormData({ fullName: '', dob: '', houseName: '', phone: '', post: '' });
         setShowForm(false);
     };
 
@@ -103,6 +104,24 @@ function UnitMembers() {
                                             />
                                         </Form.Group>
                                     </Col>
+
+                                    {/* Added Post / Position Field */}
+                                    <Col md={6} className="mb-3">
+                                        <Form.Group controlId="post">
+                                            <Form.Label>Post / Designation (Optional)</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                name="post"
+                                                placeholder="e.g. President, Secretary"
+                                                value={formData.post}
+                                                onChange={handleInputChange}
+                                            />
+                                            <Form.Text className="text-muted">
+                                                Leave blank if they are a regular member.
+                                            </Form.Text>
+                                        </Form.Group>
+                                    </Col>
+
                                 </Row>
                                 <div className="d-flex justify-content-end">
                                     <Button variant="secondary" className="me-2" onClick={() => setShowForm(false)}>Cancel</Button>
@@ -119,7 +138,7 @@ function UnitMembers() {
                             <thead className="bg-light text-secondary">
                                 <tr>
                                     <th className="py-3 ps-4">Full Name</th>
-                                    <th className="py-3">Date of Birth</th>
+                                    <th className="py-3">Position</th>
                                     <th className="py-3">House Name</th>
                                     <th className="py-3">Phone</th>
                                     <th className="py-3 text-end pe-4">Actions</th>
@@ -136,7 +155,13 @@ function UnitMembers() {
                                     members.map(member => (
                                         <tr key={member.id}>
                                             <td className="ps-4 align-middle fw-bold">{member.fullName}</td>
-                                            <td className="align-middle">{member.dob}</td>
+                                            <td className="align-middle">
+                                                {member.post ? (
+                                                    <span className="badge bg-primary rounded-pill">{member.post}</span>
+                                                ) : (
+                                                    <span className="text-muted small">Member</span>
+                                                )}
+                                            </td>
                                             <td className="align-middle">{member.houseName}</td>
                                             <td className="align-middle">{member.phone}</td>
                                             <td className="text-end pe-4">

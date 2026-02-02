@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -13,64 +13,160 @@ import Modal from 'react-bootstrap/Modal';
 import PageHeader from '../components/common/PageHeader';
 import { Plus, Trash, BoxArrowRight, CalendarEvent, CheckCircle, FileEarmarkText } from 'react-bootstrap-icons';
 import { useAuth } from '../context/AuthContext';
+import { useData } from '../context/DataContext';
 import { useNavigate } from 'react-router-dom';
 
 function Profile() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const {
+        foronaList,
+        updateUnitExecutives,
+        fetchMembers,
+        addMember,
+        deleteMember,
+        fetchEvents,
+        registerForEvent,
+        fetchRegistrations
+    } = useData();
 
-    // Member Management State
+    // Find the logged-in unit's details (kept for legacy unit executive logic)
+    const findMyUnit = () => {
+        if (!user || user.role !== 'unit') return { forona: null, unit: null };
+        for (const forona of foronaList) {
+            const unit = forona.units.find(u => u.name === user.name);
+            if (unit) return { forona, unit };
+        }
+        return { forona: null, unit: null };
+    };
+
+    const { forona: myForona, unit: myUnit } = findMyUnit();
+
+    // --- STATES ---
+
+    // Member State
     const [members, setMembers] = useState([]);
     const [showForm, setShowForm] = useState(false);
-    const [formData, setFormData] = useState({
-        fullName: '',
-        dob: '',
-        houseName: '',
-        phone: ''
-    });
+    const [formData, setFormData] = useState({ fullName: '', dob: '', houseName: '', phone: '' });
 
-    // Event Registration State
-    const [events, setEvents] = useState([
-        { id: 1, title: 'Youth Camp 2024', date: '2024-04-15', location: 'Pala', registered: false, registeredMembers: [] },
-        { id: 2, title: 'Bible Kalotsavam', date: '2024-05-20', location: 'Kottayam', registered: false, registeredMembers: [] },
-        { id: 3, title: 'Leadership Summit', date: '2024-06-10', location: 'Bharananganam', registered: false, registeredMembers: [] },
-    ]);
+    // Executive State (Legacy)
+    const [executives, setExecutives] = useState(myUnit?.executives || []);
+    const [showExecForm, setShowExecForm] = useState(false);
+    const [execFormData, setExecFormData] = useState({ name: '', post: '' });
 
-    // Modal State for Event Registration
+    // Event State
+    const [events, setEvents] = useState([]); // Fetched from DB
+    const [registrations, setRegistrations] = useState([]); // Fetched from DB
+
+    // Modal State
     const [showModal, setShowModal] = useState(false);
     const [selectedEventId, setSelectedEventId] = useState(null);
     const [selectedMembers, setSelectedMembers] = useState([]);
-
-    // Modal State for Proof
     const [showProofModal, setShowProofModal] = useState(false);
     const [proofEvent, setProofEvent] = useState(null);
+
+    // --- EFFECTS ---
+
+    // 1. Fetch Members on Load (if user is unit)
+    useEffect(() => {
+        const loadMembers = async () => {
+            if (user?.role === 'unit' && user?.entityId) {
+                // If we have entityId (unit id), fetch members
+                // Note: Auth might need to return entityId. 
+                // Currently user object in AuthContext only has name.
+                // Assuming we stored it, or using a fallback. 
+                // For now, let's assume we can fetch by name or pass ID if available.
+                // Since my updated AuthContext returned entityId, use it.
+                if (user.entityId) {
+                    const data = await fetchMembers(user.entityId);
+                    setMembers(data);
+                }
+            }
+        };
+        loadMembers();
+    }, [user, fetchMembers]);
+
+    // 2. Fetch Events & Registrations
+    useEffect(() => {
+        const loadEventsAndRegs = async () => {
+            if (user?.role === 'unit') {
+                const eventData = await fetchEvents();
+                setEvents(eventData);
+
+                if (user.entityId) {
+                    const regData = await fetchRegistrations(user.entityId);
+                    setRegistrations(regData);
+                }
+            }
+        };
+        loadEventsAndRegs();
+    }, [user, fetchEvents, fetchRegistrations]);
+
+    // 3. Sync Executives (Legacy)
+    useEffect(() => {
+        if (myUnit) {
+            setExecutives(myUnit.executives || []);
+        }
+    }, [myUnit]);
+
+
+    // --- HANDLERS ---
 
     const handleLogout = () => {
         logout();
         navigate('/');
     };
 
-    // --- Member Handlers ---
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
+    // Member Handlers
+    const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setMembers([...members, { ...formData, id: Date.now() }]);
-        setFormData({ fullName: '', dob: '', houseName: '', phone: '' });
-        setShowForm(false);
+        if (!user?.entityId) return alert("Unit ID missing. Relogin.");
+
+        const newMember = await addMember({ ...formData, unitId: user.entityId });
+        if (newMember) {
+            setMembers([...members, newMember]);
+            setFormData({ fullName: '', dob: '', houseName: '', phone: '' });
+            setShowForm(false);
+        } else {
+            alert("Failed to add member.");
+        }
     };
 
-    const handleDelete = (id) => {
-        setMembers(members.filter(member => member.id !== id));
+    const handleDelete = async (id) => {
+        if (confirm("Are you sure?")) {
+            const success = await deleteMember(id);
+            if (success) {
+                setMembers(members.filter(m => m.id !== id));
+            } else {
+                alert("Failed to delete member.");
+            }
+        }
     };
 
-    // --- Event Registration Handlers ---
+    // Executive Handlers (Legacy Local Search Sync)
+    const handleExecInputChange = (e) => setExecFormData({ ...execFormData, [e.target.name]: e.target.value });
+    const syncExecutivesGlobal = (newExecutives) => {
+        if (myForona && myUnit) {
+            updateUnitExecutives(myForona.name, myUnit.name, newExecutives);
+        }
+    };
+    const handleExecSubmit = (e) => {
+        e.preventDefault();
+        const newExecs = [...executives, { ...execFormData, id: Date.now() }];
+        setExecutives(newExecs);
+        syncExecutivesGlobal(newExecs);
+        setExecFormData({ name: '', post: '' });
+        setShowExecForm(false);
+    };
+    const handleExecDelete = (id) => {
+        const newExecs = executives.filter(ex => ex.id !== id);
+        setExecutives(newExecs);
+        syncExecutivesGlobal(newExecs);
+    };
+
+    // Event Registration Handlers
     const openRegistrationModal = (eventId) => {
         setSelectedEventId(eventId);
         setSelectedMembers([]);
@@ -85,30 +181,51 @@ function Profile() {
         }
     };
 
-    const confirmRegistration = () => {
+    const confirmRegistration = async () => {
         if (selectedMembers.length === 0) {
             alert("Please select at least one member to register.");
             return;
         }
 
-        setEvents(events.map(event =>
-            event.id === selectedEventId
-                ? { ...event, registered: true, registeredMembers: selectedMembers }
-                : event
-        ));
-        setShowModal(false);
+        const success = await registerForEvent({
+            eventId: selectedEventId,
+            memberIds: selectedMembers,
+            unitId: user.entityId // Ensure this exists from login
+        });
+
+        if (success) {
+            alert("Registration Successful!");
+            // Refresh registrations
+            const regData = await fetchRegistrations(user.entityId);
+            setRegistrations(regData);
+            setShowModal(false);
+        } else {
+            alert("Registration Failed.");
+        }
     };
 
-    // --- Proof View Handler ---
+    // Check if event is registered (simple check if any member registered)
+    const getRegistrationCount = (eventId) => {
+        return registrations.filter(r => r.event_id === eventId).length;
+    };
+
+    const isRegistered = (eventId) => {
+        return getRegistrationCount(eventId) > 0;
+    };
+
+    // View Proof
     const viewProof = (event) => {
-        const registeredEventMembers = members.filter(m => event.registeredMembers.includes(m.id));
+        // Find members who registered for this event
+        const registeredMemberIds = registrations
+            .filter(r => r.event_id === event.id)
+            .map(r => r.member_id);
+
+        const registeredEventMembers = members.filter(m => registeredMemberIds.includes(m.id));
         setProofEvent({ ...event, memberDetails: registeredEventMembers });
         setShowProofModal(true);
     };
 
-    const printProof = () => {
-        window.print();
-    };
+    const printProof = () => window.print();
 
     return (
         <>
@@ -128,16 +245,56 @@ function Profile() {
                     </Card.Body>
                 </Card>
 
-                <Tabs
-                    defaultActiveKey="members"
-                    id="profile-tabs"
-                    className="mb-4"
-                    fill
-                >
-                    {/* --- TAB 1: MEMBERS MANAGEMENT --- */}
+                <Tabs defaultActiveKey="members" id="profile-tabs" className="mb-4" fill>
+
+                    {/* --- TAB 1: MANAGING MEMBERS --- */}
                     <Tab eventKey="members" title="Manage Members">
-                        <div className="d-flex justify-content-between align-items-center mb-4 mt-4">
-                            <h3>Unit Members</h3>
+
+                        {/* Unit Executives (Attributes to Mock Data / Search) */}
+                        <div className="d-flex justify-content-between align-items-center mb-3 mt-4">
+                            <h3 className="text-primary">Unit Executives</h3>
+                            {!myForona && <small className="text-danger ms-2">(Not synced to search)</small>}
+                            <Button variant="outline-primary" onClick={() => setShowExecForm(!showExecForm)}>
+                                <Plus size={20} className="me-1" /> Add Executive
+                            </Button>
+                        </div>
+
+                        {showExecForm && (
+                            <Card className="mb-4 shadow-sm slide-in-bottom border-primary">
+                                <Card.Header className="bg-primary text-white fw-bold">Add Link Executive</Card.Header>
+                                <Card.Body>
+                                    <Form onSubmit={handleExecSubmit}>
+                                        <Row>
+                                            <Col md={6}>
+                                                <Form.Control placeholder="Name" name="name" value={execFormData.name} onChange={handleExecInputChange} required />
+                                            </Col>
+                                            <Col md={6}>
+                                                <Form.Control placeholder="Post" name="post" value={execFormData.post} onChange={handleExecInputChange} required />
+                                            </Col>
+                                        </Row>
+                                        <div className="mt-3 text-end"><Button type="submit">Save</Button></div>
+                                    </Form>
+                                </Card.Body>
+                            </Card>
+                        )}
+                        <div className="row mb-5">
+                            {executives.map(exec => (
+                                <Col md={4} key={exec.id} className="mb-3">
+                                    <Card className="h-100 shadow-sm border-0">
+                                        <Card.Body className="d-flex justify-content-between">
+                                            <div><strong>{exec.name}</strong><br /><small>{exec.post}</small></div>
+                                            <Button variant="link" className="text-danger" onClick={() => handleExecDelete(exec.id)}><Trash /></Button>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                            ))}
+                        </div>
+
+                        <hr className="my-5" />
+
+                        {/* General Members (Backend Connected) */}
+                        <div className="d-flex justify-content-between align-items-center mb-4">
+                            <h3>General Members</h3>
                             <Button variant="primary" onClick={() => setShowForm(!showForm)}>
                                 <Plus size={20} className="me-1" /> Add Member
                             </Button>
@@ -150,52 +307,20 @@ function Profile() {
                                     <Form onSubmit={handleSubmit}>
                                         <Row>
                                             <Col md={6} className="mb-3">
-                                                <Form.Group controlId="fullName">
-                                                    <Form.Label>Full Name</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        name="fullName"
-                                                        value={formData.fullName}
-                                                        onChange={handleInputChange}
-                                                        required
-                                                    />
-                                                </Form.Group>
+                                                <Form.Label>Full Name</Form.Label>
+                                                <Form.Control type="text" name="fullName" value={formData.fullName} onChange={handleInputChange} required />
                                             </Col>
                                             <Col md={6} className="mb-3">
-                                                <Form.Group controlId="dob">
-                                                    <Form.Label>Date of Birth</Form.Label>
-                                                    <Form.Control
-                                                        type="date"
-                                                        name="dob"
-                                                        value={formData.dob}
-                                                        onChange={handleInputChange}
-                                                        required
-                                                    />
-                                                </Form.Group>
+                                                <Form.Label>Date of Birth</Form.Label>
+                                                <Form.Control type="date" name="dob" value={formData.dob} onChange={handleInputChange} required />
                                             </Col>
                                             <Col md={6} className="mb-3">
-                                                <Form.Group controlId="houseName">
-                                                    <Form.Label>House Name</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        name="houseName"
-                                                        value={formData.houseName}
-                                                        onChange={handleInputChange}
-                                                        required
-                                                    />
-                                                </Form.Group>
+                                                <Form.Label>House Name</Form.Label>
+                                                <Form.Control type="text" name="houseName" value={formData.houseName} onChange={handleInputChange} required />
                                             </Col>
                                             <Col md={6} className="mb-3">
-                                                <Form.Group controlId="phone">
-                                                    <Form.Label>Phone Number</Form.Label>
-                                                    <Form.Control
-                                                        type="tel"
-                                                        name="phone"
-                                                        value={formData.phone}
-                                                        onChange={handleInputChange}
-                                                        required
-                                                    />
-                                                </Form.Group>
+                                                <Form.Label>Phone</Form.Label>
+                                                <Form.Control type="tel" name="phone" value={formData.phone} onChange={handleInputChange} required />
                                             </Col>
                                         </Row>
                                         <div className="d-flex justify-content-end">
@@ -208,42 +333,36 @@ function Profile() {
                         )}
 
                         <Card className="shadow-sm border-0">
-                            <Card.Body className="p-0">
-                                <Table responsive hover className="mb-0">
-                                    <thead className="bg-light text-secondary">
-                                        <tr>
-                                            <th className="py-3 ps-4">Full Name</th>
-                                            <th className="py-3">Date of Birth</th>
-                                            <th className="py-3">House Name</th>
-                                            <th className="py-3">Phone</th>
-                                            <th className="py-3 text-end pe-4">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {members.length === 0 ? (
-                                            <tr>
-                                                <td colSpan="5" className="text-center py-5 text-muted">
-                                                    No members added yet. Click "Add Member" to get started.
+                            <Table responsive hover className="mb-0">
+                                <thead className="bg-light">
+                                    <tr>
+                                        <th className="ps-4">Full Name</th>
+                                        <th>Date of Birth</th>
+                                        <th>House Name</th>
+                                        <th>Phone</th>
+                                        <th className="text-end pe-4">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {members.length === 0 ? (
+                                        <tr><td colSpan="5" className="text-center py-5 text-muted">No members found.</td></tr>
+                                    ) : (
+                                        members.map(member => (
+                                            <tr key={member.id}>
+                                                <td className="ps-4 fw-bold">{member.fullName || member.full_name}</td>
+                                                <td>{member.dob ? new Date(member.dob).toLocaleDateString() : ''}</td>
+                                                <td>{member.houseName || member.house_name}</td>
+                                                <td>{member.phone}</td>
+                                                <td className="text-end pe-4">
+                                                    <Button variant="link" className="text-danger p-0" onClick={() => handleDelete(member.id)}>
+                                                        <Trash size={18} />
+                                                    </Button>
                                                 </td>
                                             </tr>
-                                        ) : (
-                                            members.map(member => (
-                                                <tr key={member.id}>
-                                                    <td className="ps-4 align-middle fw-bold">{member.fullName}</td>
-                                                    <td className="align-middle">{member.dob}</td>
-                                                    <td className="align-middle">{member.houseName}</td>
-                                                    <td className="align-middle">{member.phone}</td>
-                                                    <td className="text-end pe-4">
-                                                        <Button variant="link" className="text-danger p-0" onClick={() => handleDelete(member.id)}>
-                                                            <Trash size={18} />
-                                                        </Button>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </Table>
-                            </Card.Body>
+                                        ))
+                                    )}
+                                </tbody>
+                            </Table>
                         </Card>
                     </Tab>
 
@@ -251,57 +370,51 @@ function Profile() {
                     <Tab eventKey="events" title="Event Registration">
                         <div className="mt-4">
                             <h3 className="mb-4">Upcoming Events</h3>
-                            {members.length === 0 && (
-                                <div className="alert alert-warning">
-                                    You need to add members in the "Manage Members" tab before you can register for events.
-                                </div>
-                            )}
-                            <Row>
-                                {events.map(event => (
-                                    <Col md={4} key={event.id} className="mb-4">
-                                        <Card className="h-100 shadow-sm border-0 hover-card">
-                                            <Card.Body>
-                                                <div className="d-flex justify-content-between align-items-start mb-3">
-                                                    <div className="bg-light p-2 rounded text-center" style={{ minWidth: '60px' }}>
-                                                        <span className="d-block fw-bold text-primary">{new Date(event.date).getDate()}</span>
-                                                        <small className="text-uppercase">{new Date(event.date).toLocaleString('default', { month: 'short' })}</small>
-                                                    </div>
-                                                    {event.registered && <Badge bg="success">Registered</Badge>}
-                                                </div>
-                                                <Card.Title className="fw-bold fs-5">{event.title}</Card.Title>
-                                                <Card.Text className="text-muted mb-4">
-                                                    <CalendarEvent className="me-2" />
-                                                    {new Date(event.date).toLocaleDateString()} <br />
-                                                    <small>{event.location}</small>
-                                                </Card.Text>
+                            {members.length === 0 && <div className="alert alert-warning">Add members first.</div>}
 
-                                                {event.registered ? (
-                                                    <div>
-                                                        <Button variant="outline-success" className="w-100 rounded-pill mb-2" disabled>
-                                                            <CheckCircle className="me-2" /> Registered ({event.registeredMembers.length})
-                                                        </Button>
-                                                        <Button
-                                                            variant="link"
-                                                            className="w-100 text-decoration-none"
-                                                            onClick={() => viewProof(event)}
-                                                        >
-                                                            <FileEarmarkText className="me-1" /> View Receipt
-                                                        </Button>
+                            <Row>
+                                {events.map(event => {
+                                    const registeredCount = getRegistrationCount(event.id);
+                                    const registered = registeredCount > 0;
+
+                                    return (
+                                        <Col md={4} key={event.id} className="mb-4">
+                                            <Card className="h-100 shadow-sm border-0 hover-card">
+                                                <Card.Body>
+                                                    <div className="d-flex justify-content-between align-items-start mb-3">
+                                                        <div className="bg-light p-2 rounded text-center" style={{ minWidth: '60px' }}>
+                                                            <span className="d-block fw-bold text-primary">{new Date(event.event_date).getDate()}</span>
+                                                            <small className="text-uppercase">{new Date(event.event_date).toLocaleString('default', { month: 'short' })}</small>
+                                                        </div>
+                                                        {registered && <Badge bg="success">Registered</Badge>}
                                                     </div>
-                                                ) : (
-                                                    <Button
-                                                        variant="primary"
-                                                        className="w-100 rounded-pill"
-                                                        onClick={() => openRegistrationModal(event.id)}
-                                                        disabled={members.length === 0}
-                                                    >
-                                                        Register Members
-                                                    </Button>
-                                                )}
-                                            </Card.Body>
-                                        </Card>
-                                    </Col>
-                                ))}
+                                                    <Card.Title className="fw-bold fs-5">{event.title}</Card.Title>
+                                                    <Card.Text className="text-muted mb-4">
+                                                        <CalendarEvent className="me-2" />
+                                                        {new Date(event.event_date).toLocaleDateString()} <br />
+                                                        <small>{event.location}</small>
+                                                    </Card.Text>
+
+                                                    {registered ? (
+                                                        <div>
+                                                            <Button variant="outline-success" className="w-100 rounded-pill mb-2" disabled>
+                                                                <CheckCircle className="me-2" /> Registered ({registeredCount})
+                                                            </Button>
+                                                            <Button variant="link" className="w-100 text-decoration-none" onClick={() => viewProof(event)}>
+                                                                <FileEarmarkText className="me-1" /> View Receipt
+                                                            </Button>
+                                                        </div>
+                                                    ) : (
+                                                        <Button variant="primary" className="w-100 rounded-pill" onClick={() => openRegistrationModal(event.id)} disabled={members.length === 0}>
+                                                            Register Members
+                                                        </Button>
+                                                    )}
+                                                </Card.Body>
+                                            </Card>
+                                        </Col>
+                                    );
+                                })}
+                                {events.length === 0 && <p className="text-center text-muted col-12">No upcoming events found.</p>}
                             </Row>
                         </div>
                     </Tab>
@@ -309,11 +422,9 @@ function Profile() {
 
                 {/* Registration Modal */}
                 <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Select Members to Register</Modal.Title>
-                    </Modal.Header>
+                    <Modal.Header closeButton><Modal.Title>Select Members</Modal.Title></Modal.Header>
                     <Modal.Body>
-                        <p className="text-muted mb-3">Please select the members who will be attending this event.</p>
+                        <p className="text-muted mb-3">Select members attending this event.</p>
                         {members.length > 0 ? (
                             <Form>
                                 {members.map(member => (
@@ -321,12 +432,7 @@ function Profile() {
                                         <Form.Check
                                             type="checkbox"
                                             id={`member-${member.id}`}
-                                            label={
-                                                <div>
-                                                    <strong>{member.fullName}</strong>
-                                                    <div className="small text-muted">{member.phone}</div>
-                                                </div>
-                                            }
+                                            label={<strong>{member.fullName || member.full_name}</strong>}
                                             checked={selectedMembers.includes(member.id)}
                                             onChange={() => handleMemberSelect(member.id)}
                                             className="w-100 mb-0"
@@ -334,84 +440,38 @@ function Profile() {
                                     </div>
                                 ))}
                             </Form>
-                        ) : (
-                            <p className="text-danger">No members found. Please add members first.</p>
-                        )}
+                        ) : <p className="text-danger">No members found.</p>}
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={() => setShowModal(false)}>
-                            Cancel
-                        </Button>
-                        <Button variant="primary" onClick={confirmRegistration} disabled={selectedMembers.length === 0}>
-                            Confirm Registration
-                        </Button>
+                        <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
+                        <Button variant="primary" onClick={confirmRegistration} disabled={selectedMembers.length === 0}>Confirm</Button>
                     </Modal.Footer>
                 </Modal>
 
-                {/* Registration Proof/Receipt Modal */}
+                {/* Proof Modal */}
                 <Modal show={showProofModal} onHide={() => setShowProofModal(false)} size="lg" centered>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Registration Receipt</Modal.Title>
-                    </Modal.Header>
+                    <Modal.Header closeButton><Modal.Title>Registration Receipt</Modal.Title></Modal.Header>
                     <Modal.Body className="p-4" id="printable-area">
                         {proofEvent && (
                             <div className="border p-4 rounded bg-white">
-                                <div className="text-center mb-4 border-bottom pb-3">
-                                    <h2 className="text-primary fw-bold">SMYM Eparchy of Palai</h2>
-                                    <h4 className="text-uppercase mb-2">{proofEvent.title}</h4>
-                                    <p className="text-muted mb-0">
-                                        <strong>Date:</strong> {new Date(proofEvent.date).toLocaleDateString()} |
-                                        <strong> Location:</strong> {proofEvent.location}
-                                    </p>
-                                </div>
-
-                                <div className="mb-4">
-                                    <h5 className="fw-bold">Unit Details</h5>
-                                    <p>
-                                        <strong>Unit Name:</strong> {user?.name}
-                                    </p>
-                                </div>
-
-                                <div>
-                                    <h5 className="fw-bold mb-3">Registered Members List</h5>
-                                    <Table bordered size="sm">
-                                        <thead className="bg-light">
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Full Name</th>
-                                                <th>House Name</th>
-                                                <th>Phone</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {proofEvent.memberDetails && proofEvent.memberDetails.map((member, index) => (
-                                                <tr key={member.id}>
-                                                    <td>{index + 1}</td>
-                                                    <td>{member.fullName}</td>
-                                                    <td>{member.houseName}</td>
-                                                    <td>{member.phone}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </Table>
-                                </div>
-
-                                <div className="mt-5 text-end pt-3 text-muted small">
-                                    <p>Generated on: {new Date().toLocaleString()}</p>
-                                </div>
+                                <h2 className="text-center text-primary mb-3">SMYM Eparchy of Palai</h2>
+                                <h4 className="text-center mb-4">{proofEvent.title}</h4>
+                                <Table bordered>
+                                    <thead><tr><th>#</th><th>Name</th><th>Phone</th></tr></thead>
+                                    <tbody>
+                                        {proofEvent.memberDetails?.map((m, i) => (
+                                            <tr key={m.id}><td>{i + 1}</td><td>{m.fullName || m.full_name}</td><td>{m.phone}</td></tr>
+                                        ))}
+                                    </tbody>
+                                </Table>
                             </div>
                         )}
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={() => setShowProofModal(false)}>
-                            Close
-                        </Button>
-                        <Button variant="primary" onClick={printProof}>
-                            <FileEarmarkText className="me-2" /> Print Receipt
-                        </Button>
+                        <Button variant="secondary" onClick={() => setShowProofModal(false)}>Close</Button>
+                        <Button variant="primary" onClick={printProof}>Print</Button>
                     </Modal.Footer>
                 </Modal>
-
             </Container>
         </>
     );

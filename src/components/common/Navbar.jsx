@@ -60,7 +60,10 @@ function AppNavbar() {
                 <NavDropdown.Item as={Link} to="/activities">Social Service</NavDropdown.Item>
               </NavDropdown>
 
-              <Nav.Link as={Link} to="/forona" className="nav-link-custom">Forona</Nav.Link>
+              <NavDropdown title="Forona" id="forona-dropdown">
+                <NavDropdown.Item as={Link} to="/forona">Find Unit</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/forona-executives">Manage Executives</NavDropdown.Item>
+              </NavDropdown>
               <Nav.Link as={Link} to="/contact" className="nav-link-custom">Contact</Nav.Link>
             </Nav>
 
