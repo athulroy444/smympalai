@@ -9,9 +9,9 @@ function Home() {
     return (
         <>
             <HeroCarousel />
-            <KarmaRekha />
             <HistorySection />
             <RoopathaExecutives />
+            <KarmaRekha />
             <StatsSection />
             <NewsSection />
         </>
