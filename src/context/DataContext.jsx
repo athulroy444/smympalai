@@ -7,7 +7,18 @@ export const useData = () => useContext(DataContext);
 
 export const DataProvider = ({ children }) => {
 
-    // --- DATABASE CONTENT ---
+    // --- KARMA REKHA ---
+    const [karmaRekha, setKarmaRekha] = useState({
+        title: "Karma Rekha 2025",
+        link: "#"
+    });
+
+    const updateKarmaRekha = (data) => {
+        setKarmaRekha(data);
+        // Persist to backend if needed (skipped for now as per minimal requirement, easy to add)
+    };
+
+    // --- DB ACTIONS (Previously Defined) ---
     const [activities, setActivities] = useState([]);
     const [news, setNews] = useState([]);
     const [eventsList, setEventsList] = useState([]); // Registrable Events
@@ -310,7 +321,9 @@ export const DataProvider = ({ children }) => {
             deleteNews, // New
             eventsList, // New
             addEvent, // New
-            deleteEvent // New
+            deleteEvent, // New
+            karmaRekha, // New
+            updateKarmaRekha // New
         }}>
             {children}
         </DataContext.Provider>
