@@ -1,0 +1,202 @@
+/* Global Styles */
+:root {
+    --primary-color: #E14B1F;
+    /* Example Brand Color */
+    --secondary-color: #1A1A1A;
+    --light-bg: #f8f9fa;
+    --transition-speed: 0.3s;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    /* Rich Gradient Background for Glassmorphism Context */
+    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    background-image:
+        radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+        radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+        radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+    background-attachment: fixed;
+    /* Parallax-like effect */
+    background-size: cover;
+    color: #e0e0e0;
+    /* Build for dark/glass theme or adjust accordingly. Let's stick to light glass for now */
+    background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+    /* Fallback or alternative vibrant one? User asked for texture. */
+    /* Let's go with a professional, subtle, yet textured approach */
+    background: linear-gradient(109.6deg, rgb(233, 237, 245) 11.2%, rgb(240, 243, 248) 91.1%);
+    background-image: url("https://www.transparenttextures.com/patterns/cubes.png"), linear-gradient(to right, #ece9e6, #ffffff);
+    color: #333;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Glassmorphism Utilities */
+.glass-effect,
+.card,
+.glass-navbar,
+.modal-content {
+    background: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15) !important;
+}
+
+/* Ensure text readability on glass */
+.card-body,
+.modal-body {
+    position: relative;
+    z-index: 2;
+}
+
+
+/* Animations */
+@keyframes slideInBottom {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-in-bottom {
+    animation: slideInBottom 0.6s ease-out forwards;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Card Hover Effects - Enhanced for Glass */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+    border-radius: 16px;
+    /* Slightly more rounded for glass feel */
+    overflow: hidden;
+    /* Contains the blur */
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(31, 38, 135, 0.25) !important;
+    background: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Button Styling */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(225, 75, 31, 0.3);
+    /* Glow effect */
+}
+
+.btn-primary:hover {
+    background-color: #c03d19;
+    border-color: #c03d19;
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(225, 75, 31, 0.5);
+}
+
+/* Form Controls - Glassy Inputs */
+.form-control,
+.form-select {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+}
+
+.form-control:focus,
+.form-select:focus {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(225, 75, 31, 0.25);
+}
+
+/* Typography Enhancements */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #1a1a1a;
+}
+
+/* Page Header Styles - Glass Variant */
+.page-header {
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(44, 44, 44, 0.95) 100%);
+    backdrop-filter: blur(10px);
+    color: white;
+    padding: 4rem 0;
+    margin-bottom: 2rem;
+    position: relative;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Add a subtle pattern overlay to header */
+/* Add a subtle pattern overlay to header */
+.page-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Hero Carousel Sizing */
+.hero-carousel-item {
+    height: 65vh;
+    position: relative;
+    background-color: #000;
+}
+
+@media (max-width: 768px) {
+    .hero-carousel-item {
+        height: 50vh;
+    }
+}
+
+/* Professional Glass Texture Refinements */
+.glass-effect,
+.card,
+.glass-navbar,
+.modal-content {
+    /* More transparent + gradient sheen */
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.4) 100%) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+
+    /* Subtle white border for "cut glass" look */
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.7) !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.7) !important;
+
+    /* Soft shadow */
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
+}
+
+.card:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.5) 100%) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-5px);
+}
