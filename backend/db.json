@@ -1,0 +1,140 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "username": "smympalai",
+            "password_hash": "$2b$10$wT0/y.O.z/e.g.s..hash..",
+            "role": "admin",
+            "entity_id": null
+        },
+        {
+            "id": 2,
+            "username": "Cathedral",
+            "password_hash": "$2b$10$xyz...",
+            "role": "unit",
+            "entity_id": 1
+        }
+    ],
+    "units": [
+        {
+            "id": 1,
+            "name": "Cathedral",
+            "forona_id": 1
+        }
+    ],
+    "foronas": [
+        {
+            "id": 1,
+            "name": "Pala"
+        }
+    ],
+    "roopatha_executives": [
+        {
+            "id": 1,
+            "name": "Fr. Thomas",
+            "position": "Director",
+            "image": ""
+        },
+        {
+            "id": 2,
+            "name": "Sr. Ancy",
+            "position": "Animator",
+            "image": ""
+        },
+        {
+            "id": 3,
+            "name": "Albin Soby",
+            "position": "President",
+            "image": ""
+        },
+        {
+            "id": 4,
+            "name": "Jomon",
+            "position": "General Secretary",
+            "image": ""
+        },
+        {
+            "id": 5,
+            "name": "Sneha",
+            "position": "Vice President",
+            "image": ""
+        },
+        {
+            "id": 6,
+            "name": "Tony",
+            "position": "Joint Secretary",
+            "image": ""
+        },
+        {
+            "id": 7,
+            "name": "Rony",
+            "position": "Treasurer",
+            "image": ""
+        },
+        {
+            "id": 8,
+            "name": "Allen",
+            "position": "Cyber Wing",
+            "image": ""
+        },
+        {
+            "id": 9,
+            "name": "Tinu",
+            "position": "State Leader",
+            "image": ""
+        },
+        {
+            "id": 10,
+            "name": "Jiss",
+            "position": "Pro Life",
+            "image": ""
+        },
+        {
+            "id": 11,
+            "name": "Mijo",
+            "position": "Forane Rep",
+            "image": ""
+        },
+        {
+            "id": 12,
+            "name": "Aleena",
+            "position": "Forane Rep",
+            "image": ""
+        }
+    ],
+    "executives": [],
+    "members": [
+        {
+            "id": 1770012155365,
+            "full_name": "Athul Roy",
+            "dob": "2004-04-04",
+            "house_name": "Athul Roy",
+            "phone": "08113998974",
+            "unit_id": 1
+        }
+    ],
+    "activities": [],
+    "news": [],
+    "events": [
+        {
+            "id": 1,
+            "title": "Youth Camp 2024",
+            "event_date": "2024-04-15",
+            "location": "Pala"
+        },
+        {
+            "id": 1770012510795,
+            "title": "SPORTS",
+            "event_date": "2026-02-12",
+            "location": "TBD"
+        }
+    ],
+    "registrations": [
+        {
+            "id": 1770012193227.4695,
+            "event_id": 1,
+            "member_id": 1770012155365,
+            "unit_id": 1
+        }
+    ]
+}
