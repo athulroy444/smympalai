@@ -4,6 +4,7 @@ import HistorySection from "../components/home/HistorySection";
 import StatsSection from "../components/home/StatsSection";
 import NewsSection from "../components/home/NewsSection";
 import SecretariatPage from "../components/home/ROOPATHA";
+import SyndicatePage from "../components/home/Syndicate";
 
 function Home() {
     return (
@@ -11,7 +12,7 @@ function Home() {
             <HeroCarousel />
             <HistorySection />
             <SecretariatPage />
-
+            <SyndicatePage />
             <KarmaRekha />
             <StatsSection />
             <NewsSection />

@@ -16,14 +16,13 @@ import globalpresidentImg from '../../assets/adv.sam.jpeg';
 import statevicepresidentImg from '../../assets/adv.prathheksha.jpeg';
 import statetreasurerImg from '../../assets/nikhil.jpeg';
 
-
 const SecretariatHome = () => {
     const members = [
-        { name: "MAR. JOSEPH KALLARANGAT", role: "PATRON", image: patronImg },
-        { name: "MSGR. SEBASTIAN VETHANATH", role: "VG. Incharge", image: msgrImg },
-        { name: "FR. MANI KOZHUPPANKUTTY", role: "DIRECTOR", image: dirImg },
-        { name: "SR. NAVEENA CMC", role: "JOINT DIRECTOR", image: jointdirImg },
-        { name: "MIJO JOY", role: "PRESIDENT", image: presidentImg },
+        { name: "MAR. JOSEPH KALLARANGAT", role: "PATRON", image: patronImg, pos: 'center 13%', special: true },
+        { name: "MSGR. SEBASTIAN VETHANATH", role: "VG. Incharge", image: msgrImg, pos: 'center 13%' },
+        { name: "FR. MANI KOZHUPPANKUTTY", role: "DIRECTOR", image: dirImg, pos: 'center 13%' },
+        { name: "SR. NAVEENA CMC", role: "JOINT DIRECTOR", image: jointdirImg, pos: 'center 13%' },
+        { name: "MIJO JOY", role: "PRESIDENT", image: presidentImg, pos: 'center 53%' },
         { name: "SONA A. MATHEW", role: "GEN. SECRETARY", image: gensecretaryImg },
         { name: "RACHEL MARY CHARLES", role: "VICE PRESIDENT", image: vicepresidentImg1 },
         { name: "ABIN THOMAS", role: "VICE PRESIDENT", image: vicepresidentImg2 },
@@ -41,7 +40,6 @@ const SecretariatHome = () => {
         <div style={styles.container}>
             <style>{hoverEffects}</style>
 
-            {/* Header Section */}
             <header style={styles.header}>
                 <div style={styles.topBar}></div>
                 <h1 style={styles.mainTitle}>SMYM-KCYM EPARCHY OF PALAI</h1>
@@ -50,24 +48,33 @@ const SecretariatHome = () => {
                 </div>
             </header>
 
-            {/* Modern Profile Grid */}
-            <main style={styles.grid}>
+            <main className="members-grid" style={styles.grid}>
                 {members.map((m, i) => (
-                    <div key={i} className="member-card" style={styles.card}>
+                    <div key={i} className={`glass-card ${m.special ? 'special-card' : ''}`} style={styles.card}>
                         <div style={styles.imageContainer}>
-                            <div style={styles.imageBackground}></div>
                             <img
-                                src={m.image || `https://ui-avatars.com/api/?name=${m.name}&background=1a3a3a&color=fff&size=256`}
+                                src={m.image}
                                 alt={m.name}
-                                style={styles.img}
+                                style={{
+                                    ...styles.img,
+                                    // Default to top-center to ensure faces are visible
+                                    objectPosition: m.pos || 'center 15%'
+                                }}
                             />
-                            <div style={styles.accentBorder}></div>
+                            <div style={styles.imageOverlay}></div>
                         </div>
 
                         <div style={styles.infoBox}>
-                            <span style={styles.roleTag}>{m.role}</span>
+                            <span style={{
+                                ...styles.roleTag,
+                                color: m.special ? '#fbbf24' : '#ef4444'
+                            }}>
+                                {m.role}
+                            </span>
                             <h3 style={styles.nameText}>{m.name}</h3>
                         </div>
+
+                        <div className="glass-line" style={styles.glassLine}></div>
                     </div>
                 ))}
             </main>
@@ -75,138 +82,125 @@ const SecretariatHome = () => {
     );
 };
 
-// --- Professional CSS-in-JS ---
 const styles = {
     container: {
-        backgroundColor: '#0c053bff', // Deep Navy Midnight
+        backgroundColor: '#050a18',
         color: '#f8fafc',
         minHeight: '100vh',
-        padding: '60px 20px',
-        fontFamily: "'Inter', system-ui, sans-serif",
-        backgroundImage: 'radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 100%)',
+        padding: '60px 15px',
+        fontFamily: "'Inter', sans-serif",
+        backgroundImage: 'radial-gradient(circle at 50% 0%, #1a2a4a 0%, #050a18 100%)',
     },
-    header: {
-        textAlign: 'center',
-        marginBottom: '80px',
-    },
-    topBar: {
-        width: '60px',
-        height: '4px',
-        backgroundColor: '#fbbf24',
-        margin: '0 auto 20px',
-        borderRadius: '2px',
-    },
-    mainTitle: {
-        fontSize: 'clamp(1.8rem, 5vw, 3.5rem)',
-        fontWeight: '900',
-        letterSpacing: '-0.02em',
-        margin: '0',
-        color: '#ffffff',
-    },
+    header: { textAlign: 'center', marginBottom: '50px' },
+    topBar: { width: '40px', height: '3px', backgroundColor: '#fbbf24', margin: '0 auto 15px' },
+    mainTitle: { fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', fontWeight: '900', color: '#fff', letterSpacing: '-0.02em' },
     subTitleBox: {
-        marginTop: '15px',
-        display: 'inline-block',
-        padding: '8px 20px',
-        border: '1px solid rgba(251, 191, 36, 0.3)',
+        marginTop: '10px',
+        padding: '6px 16px',
+        background: 'rgba(251, 191, 36, 0.1)',
         borderRadius: '50px',
-        backgroundColor: 'rgba(218, 239, 36, 0.05)',
+        display: 'inline-block',
+        border: '1px solid rgba(251, 191, 36, 0.2)'
     },
-    subTitle: {
-        fontSize: '1.1rem',
-        color: '#fbbf24',
-        fontWeight: '600',
-        letterSpacing: '0.1em',
-    },
+    subTitle: { fontSize: '0.8rem', color: '#fbbf24', fontWeight: '700', letterSpacing: '1px' },
+
     grid: {
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-        gap: '40px 25px',
-        maxWidth: '1200px',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+        gap: '20px',
+        maxWidth: '1350px',
         margin: '0 auto',
     },
     card: {
         position: 'relative',
-        transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        background: 'rgba(255, 255, 255, 0.04)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        borderRadius: '14px',
+        padding: '10px',
+        transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
         cursor: 'pointer',
+        overflow: 'hidden',
     },
     imageContainer: {
-        position: 'relative',
-        height: '240px',
-        borderRadius: '16px',
+        // Height increased to 210px for a more professional portrait aspect ratio
+        height: '210px',
+        borderRadius: '10px',
         overflow: 'hidden',
-        marginBottom: '15px',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)',
-    },
-    imageBackground: {
-        position: 'absolute',
-        inset: 0,
-        background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%)',
-        zIndex: 1,
+        position: 'relative',
+        marginBottom: '12px',
+        backgroundColor: '#0f172a',
     },
     img: {
         width: '100%',
         height: '100%',
         objectFit: 'cover',
+        transition: 'transform 0.6s cubic-bezier(0.33, 1, 0.68, 1)',
     },
-    accentBorder: {
+    imageOverlay: {
         position: 'absolute',
-        bottom: 0,
-        left: 0,
-        width: '100%',
-        height: '4px',
-        backgroundColor: '#fbbf24',
-        zIndex: 2,
+        inset: 0,
+        background: 'linear-gradient(to bottom, transparent 65%, rgba(0,0,0,0.6) 100%)',
     },
     infoBox: {
-        textAlign: 'left',
-        paddingLeft: '5px',
+        padding: '0 4px 6px',
     },
     roleTag: {
-        color: '#ef4444', // Red accent
-        fontSize: '0.75rem',
+        fontSize: '0.65rem',
         fontWeight: '800',
         textTransform: 'uppercase',
-        letterSpacing: '0.05em',
         display: 'block',
         marginBottom: '4px',
     },
     nameText: {
-        fontSize: '1rem',
+        fontSize: '0.85rem',
         fontWeight: '700',
-        margin: 0,
-        color: '#f1f5f9',
-        lineHeight: '1.4',
+        color: '#fff',
+        lineHeight: '1.3',
     },
-    footer: {
-        marginTop: '100px',
-        textAlign: 'center',
-        borderTop: '1px solid rgba(255,255,255,0.1)',
-        paddingTop: '60px',
-    },
-    malayalamSecondary: {
-        fontSize: '1.1rem',
-        opacity: 0.7,
-        maxWidth: '600px',
-        margin: '0 auto 20px',
-        lineHeight: '1.6',
-    },
-    malayalamPrimary: {
-        fontSize: 'clamp(2.5rem, 8vw, 5rem)',
-        fontWeight: '900',
-        margin: 0,
-        background: 'linear-gradient(to bottom, #ffffff, #94a3b8)',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
+    glassLine: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        width: '0%',
+        height: '3px',
+        background: '#fbbf24',
+        transition: 'width 0.4s ease',
     }
 };
 
 const hoverEffects = `
-  .member-card:hover {
-    transform: translateY(-10px);
+  @media (min-width: 1200px) {
+    .members-grid {
+      grid-template-columns: repeat(5, 1fr) !important;
+    }
   }
-  .member-card:hover img {
-    transform: scale(1.05);
-    transition: transform 0.4s ease;
+
+  @media (min-width: 768px) and (max-width: 1199px) {
+    .members-grid {
+      grid-template-columns: repeat(3, 1fr) !important;
+    }
+  }
+
+  .glass-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-8px);
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .glass-card:hover img {
+    transform: scale(1.1);
+  }
+
+  .glass-card:hover .glass-line {
+    width: 100%;
+  }
+
+  .special-card {
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    background: rgba(251, 191, 36, 0.05);
   }
 `;
 
