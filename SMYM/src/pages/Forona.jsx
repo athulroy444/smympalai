@@ -14,6 +14,17 @@ function Forona() {
     const [selectedUnit, setSelectedUnit] = useState('');
     const [showDetails, setShowDetails] = useState(false);
 
+    // Effect to handle navigation from Navbar
+    React.useEffect(() => {
+        const stored = localStorage.getItem('selected_forona');
+        if (stored) {
+            setSelectedForona(stored);
+            localStorage.removeItem('selected_forona');
+            // We don't show details yet because a unit isn't selected, 
+            // but the Forona dropdown will be pre-filled.
+        }
+    }, []);
+
     const currentForonaData = selectedForona
         ? foronaList.find(f => f.name === selectedForona)
         : null;
@@ -117,46 +128,73 @@ function Forona() {
                     </Col>
                 </Row>
 
+                {!showDetails && !selectedForona && (
+                    <Row className="mt-4 g-4">
+                        <Col xs={12}>
+                            <h3 className="text-center mb-5 fw-bold" style={{ letterSpacing: '1px' }}>EXPLORE OUR FORONAS</h3>
+                        </Col>
+                        {foronaList.map((f, i) => (
+                            <Col key={i} xl={3} lg={4} md={6} sm={6}>
+                                <Card
+                                    className="h-100 border-0 shadow-sm forona-grid-card"
+                                    onClick={() => {
+                                        setSelectedForona(f.name);
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    }}
+                                    style={{ cursor: 'pointer', transition: 'all 0.3s ease', borderRadius: '15px', overflow: 'hidden' }}
+                                >
+                                    <Card.Body className="d-flex flex-column align-items-center justify-content-center py-4" style={{ background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(5px)' }}>
+                                        <div className="mb-3 rounded-circle d-flex align-items-center justify-content-center" style={{ width: '50px', height: '50px', background: 'rgba(225, 75, 31, 0.1)', color: '#E14B1F' }}>
+                                            <span className="fw-bold fs-4">{f.name.charAt(0)}</span>
+                                        </div>
+                                        <Card.Title className="h5 fw-bold text-dark text-center mb-2">{f.name}</Card.Title>
+                                        <div className="text-muted small text-uppercase fw-bold ls-1" style={{ fontSize: '0.65rem' }}>
+                                            {f.units?.length || 0} Units Available
+                                        </div>
+                                    </Card.Body>
+                                    <div className="card-footer-glow"></div>
+                                </Card>
+                            </Col>
+                        ))}
+                    </Row>
+                )}
+
                 {showDetails && currentUnitData && (
                     <Row className="mt-5 justify-content-center fade-in-up">
                         <Col md={10}>
-                            <Card className="shadow border-0">
-                                <Card.Header className="bg-white border-bottom-0 pt-4 pb-0 text-center">
-                                    <h2 style={{ color: '#E14B1F' }}>{currentUnitData.name} Unit</h2>
-                                    <p className="text-muted">{selectedForona} Forona</p>
+                            {/* ... (Existing Unit Details Card) */}
+                            <Card className="shadow border-0" style={{ borderRadius: '20px', overflow: 'hidden' }}>
+                                <Card.Header className="bg-white border-bottom-0 pt-5 pb-0 text-center">
+                                    <div className="text-uppercase text-primary fw-bold small mb-2" style={{ letterSpacing: '2px' }}>{selectedForona} Forona</div>
+                                    <h1 className="display-5 fw-900" style={{ color: '#1A1A1A' }}>{currentUnitData.name} Unit</h1>
+                                    <div style={{ width: '60px', height: '4px', background: '#E14B1F', margin: '20px auto' }}></div>
                                 </Card.Header>
-                                <Card.Body className="p-5">
-                                    <div className="text-center mb-4">
-                                        <div className="p-4 bg-light rounded mb-3">
-                                            <p className="mb-0 fs-5 text-secondary">
-                                                Specific details about the <strong>{currentUnitData.name}</strong> unit.
-                                            </p>
-                                        </div>
-                                    </div>
-
+                                <Card.Body className="p-4 p-md-5">
                                     {/* Display Unit Executives */}
                                     {currentUnitData.executives?.length > 0 ? (
                                         <div className="mb-4">
-                                            <h4 className="text-center mb-4 border-bottom pb-2">Unit Executives</h4>
-                                            <Row className="justify-content-center">
+                                            <h4 className="text-center mb-4 fw-bold">Unit Executives</h4>
+                                            <Row className="justify-content-center g-3">
                                                 {currentUnitData.executives.map((exec, idx) => (
-                                                    <Col key={idx} md={4} sm={6} className="mb-3">
-                                                        <Card className="h-100 border-0 shadow-sm text-center bg-light">
-                                                            <Card.Body>
-                                                                <Card.Title className="h6">{exec.name}</Card.Title>
-                                                                <Card.Subtitle className="mb-2 text-muted small">{exec.post}</Card.Subtitle>
-                                                            </Card.Body>
+                                                    <Col key={idx} lg={4} md={6}>
+                                                        <Card className="h-100 border-0 shadow-sm text-center bg-light p-3" style={{ borderRadius: '12px' }}>
+                                                            <div className="role-chip mb-2">{exec.post}</div>
+                                                            <h6 className="fw-bold mb-0">{exec.name}</h6>
                                                         </Card>
                                                     </Col>
                                                 ))}
                                             </Row>
                                         </div>
                                     ) : (
-                                        <p className="text-center text-muted">No executives listed for this unit.</p>
+                                        <div className="text-center py-4 bg-light rounded" style={{ border: '1px dashed #ccc' }}>
+                                            <p className="text-muted mb-0">No executives listed for this unit yet.</p>
+                                        </div>
                                     )}
 
-                                    <div className="text-center mt-4">
-                                        <Button variant="outline-dark" size="sm">Coming Soon</Button>
+                                    <div className="text-center mt-5">
+                                        <Button variant="outline-dark" className="rounded-pill px-4" onClick={() => setShowDetails(false)}>
+                                            Back to Selection
+                                        </Button>
                                     </div>
                                 </Card.Body>
                             </Card>
@@ -167,18 +205,38 @@ function Forona() {
 
             <style>
                 {`
+                .forona-grid-card:hover {
+                    transform: translateY(-10px);
+                    box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+                    background: #fff !important;
+                }
+                .forona-grid-card:hover .card-title {
+                    color: #E14B1F !important;
+                }
+                .card-footer-glow {
+                    height: 4px;
+                    width: 0;
+                    background: #E14B1F;
+                    transition: width 0.3s ease;
+                }
+                .forona-grid-card:hover .card-footer-glow {
+                    width: 100%;
+                }
+                .role-chip {
+                    font-size: 0.6rem;
+                    font-weight: 800;
+                    text-transform: uppercase;
+                    color: #E14B1F;
+                    letter-spacing: 1px;
+                }
+                .ls-1 { letter-spacing: 1px; }
+                .fw-900 { font-weight: 900; }
                 .fade-in-up {
-                    animation: fadeInUp 0.5s ease-out;
+                    animation: fadeInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) both;
                 }
                 @keyframes fadeInUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(20px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
+                    from { opacity: 0; transform: translateY(30px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
                 `}
             </style>

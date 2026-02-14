@@ -2,7 +2,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import PageHeader from '../components/common/PageHeader';
-import image1 from '../assets/jubilee.jpeg';
+import image1 from '../assets/Frame 1.png';
 
 function About() {
     return (
@@ -60,7 +60,7 @@ function About() {
                         <div className="bg-light p-4 rounded h-100">
                             <div className="rounded-circle bg-secondary mx-auto mb-3" style={{ width: '120px', height: '120px' }}></div>
                             <h5 className="fw-bold">Youth President</h5>
-                            <p className="text-muted small">President</p>
+                            <p className="text-muted small">MIJO JOY</p>
                         </div>
                     </Col>
                     {/* Placeholder for Animator */}

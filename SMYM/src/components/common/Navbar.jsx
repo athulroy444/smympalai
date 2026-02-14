@@ -8,9 +8,11 @@ import TopBar from './TopBar';
 import smymLogo from "../../assets/NavLogo.png";
 import { PersonCircle, BoxArrowRight, People } from 'react-bootstrap-icons';
 import { useAuth } from '../../context/AuthContext';
+import { useData } from '../../context/DataContext';
 
 function AppNavbar() {
   const { user, logout } = useAuth();
+  const { foronaList } = useData();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -64,6 +66,11 @@ function AppNavbar() {
             .nav-link-custom:hover::after {
               width: 70%;
             }
+            .forona-scroll-menu {
+              max-height: 400px;
+              overflow-y: auto;
+              min-width: 220px;
+            }
           `}</style>
 
           <Navbar.Toggle aria-controls="navbarScroll" />
@@ -88,8 +95,31 @@ function AppNavbar() {
               </NavDropdown>
 
               <NavDropdown title="Forona" id="forona-dropdown">
-                <NavDropdown.Item as={Link} to="/forona">Find Unit</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/forona-executives">Manage Executives</NavDropdown.Item>
+                <div className="forona-scroll-menu">
+                  <NavDropdown.Item as={Link} to="/forona" className="text-primary border-bottom pb-2 mb-2">
+                    Browse All Units
+                  </NavDropdown.Item>
+                  <NavDropdown.Header className="text-muted small fw-bold">Select Forona</NavDropdown.Header>
+                  {foronaList.map((forona, index) => (
+                    <NavDropdown.Item
+                      key={index}
+                      as={Link}
+                      to="/forona"
+                      onClick={() => {
+                        // We can't easily pass state through NavDropdown.Item to Forona page without search params or context
+                        // But we can use localStorage or a simple trick if needed
+                        localStorage.setItem('selected_forona', forona.name);
+                      }}
+                      style={{ fontSize: '0.8rem', textTransform: 'capitalize' }}
+                    >
+                      {forona.name}
+                    </NavDropdown.Item>
+                  ))}
+                  <NavDropdown.Divider />
+                  <NavDropdown.Item as={Link} to="/forona-executives" style={{ fontSize: '0.8rem' }}>
+                    Manage Executives
+                  </NavDropdown.Item>
+                </div>
               </NavDropdown>
               <Nav.Link as={Link} to="/contact" className="nav-link-custom">Contact</Nav.Link>
             </Nav>
