@@ -3,15 +3,22 @@
         {
             "id": 1,
             "username": "smympalai",
-            "password_hash": "$2b$10$wT0/y.O.z/e.g.s..hash..",
+            "password_hash": "$2b$10$FLK5M777iI0gPdt3JavEYuSzunlMRFgECjWZ2PWvKp8lVQN9oVte6",
             "role": "admin",
             "entity_id": null
         },
         {
             "id": 2,
             "username": "Cathedral",
-            "password_hash": "$2b$10$xyz...",
+            "password_hash": "$2b$10$h6M/0Z6kba8a/3tpr2oV7.UCT7XJO1X6IHRBFNbqK5ABJ/eXfKcim",
             "role": "unit",
+            "entity_id": 1
+        },
+        {
+            "id": 3,
+            "username": "Pala",
+            "password_hash": "$2b$10$hfv37tBABG.D4K5gWFXgEOs47oma382ob6cI7DTg./6O35qR3yMJW",
+            "role": "forona",
             "entity_id": 1
         }
     ],
