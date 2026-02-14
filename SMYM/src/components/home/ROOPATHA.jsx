@@ -177,10 +177,13 @@ const hoverEffects = `
     }
   }
 
-  @media (min-width: 768px) and (max-width: 1199px) {
+  @media (max-width: 767px) {
     .members-grid {
-      grid-template-columns: repeat(3, 1fr) !important;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+      gap: 15px !important;
     }
+    .glass-card { padding: 10px !important; }
+    #root h1 { font-size: 1.8rem !important; }
   }
 
   .glass-card:hover {

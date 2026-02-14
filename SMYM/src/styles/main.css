@@ -41,6 +41,16 @@ body {
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15) !important;
 }
 
+.section-padding {
+    padding: 80px 0;
+}
+
+@media (max-width: 768px) {
+    .section-padding {
+        padding: 50px 0;
+    }
+}
+
 /* Ensure text readability on glass */
 .card-body,
 .modal-body {
@@ -149,6 +159,12 @@ h6 {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+@media (max-width: 768px) {
+    .page-header {
+        padding: 2.5rem 0;
+    }
+}
+
 /* Add a subtle pattern overlay to header */
 /* Add a subtle pattern overlay to header */
 .page-header::before {
@@ -172,7 +188,34 @@ h6 {
 
 @media (max-width: 768px) {
     .hero-carousel-item {
-        height: 50vh;
+        height: 45vh;
+        min-height: 300px;
+    }
+
+    .display-4,
+    .display-5,
+    .display-6 {
+        font-size: 2.2rem !important;
+    }
+}
+
+.nav-tabs .nav-link {
+    font-weight: 600;
+    color: #555;
+    border: none;
+    border-bottom: 3px solid transparent;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-color) !important;
+    border-bottom: 3px solid var(--primary-color) !important;
+    background: transparent !important;
+}
+
+@media (max-width: 576px) {
+    .nav-tabs .nav-link {
+        padding: 10px 12px;
+        font-size: 0.85rem;
     }
 }
 

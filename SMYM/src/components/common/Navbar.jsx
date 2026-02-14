@@ -28,16 +28,43 @@ function AppNavbar() {
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
             <img
               src={smymLogo}
-              width="50"
-              height="50"
-              className="d-inline-block align-top rounded-circle me-3"
+              width="45"
+              height="45"
+              className="d-inline-block align-top rounded-circle me-2 me-md-3 brand-logo"
               alt="SMYM Logo"
             />
-            <div className="d-flex flex-column">
-              <span style={{ fontWeight: 700, fontSize: '1.2rem', color: '#E14B1F' }}>SMYM</span>
-              <span style={{ fontSize: '0.85rem', color: '#1A1A1A', textTransform: 'uppercase', letterSpacing: '1px' }}>Eparchy of Palai</span>
+            <div className="d-flex flex-column brand-text">
+              <span className="brand-name" style={{ fontWeight: 800, fontSize: '1.2rem', color: '#E14B1F', lineHeight: 1.1 }}>SMYM</span>
+              <span className="brand-sub" style={{ fontSize: '0.75rem', color: '#1A1A1A', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>Eparchy of Palai</span>
             </div>
           </Navbar.Brand>
+
+          <style>{`
+            @media (max-width: 380px) {
+              .brand-sub { font-size: 0.65rem !important; }
+              .brand-name { font-size: 1rem !important; }
+              .brand-logo { width: 35px !important; height: 35px !important; }
+            }
+            .nav-link-custom {
+              position: relative;
+              padding: 0.5rem 0.8rem !important;
+              transition: color 0.3s ease;
+            }
+            .nav-link-custom::after {
+              content: '';
+              position: absolute;
+              bottom: 0;
+              left: 50%;
+              width: 0;
+              height: 2px;
+              background: #E14B1F;
+              transition: all 0.3s ease;
+              transform: translateX(-50%);
+            }
+            .nav-link-custom:hover::after {
+              width: 70%;
+            }
+          `}</style>
 
           <Navbar.Toggle aria-controls="navbarScroll" />
           <Navbar.Collapse id="navbarScroll">
