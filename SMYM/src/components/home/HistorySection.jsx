@@ -2,7 +2,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import image1 from '../../assets/jubilee.jpeg';
+import image1 from '../../assets/Frame 1.png';
 
 function HistorySection() {
     return (

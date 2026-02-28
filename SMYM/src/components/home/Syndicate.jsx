@@ -24,9 +24,10 @@ import syndicate15 from '../../assets/AleenaRobins.jpg.jpeg';
 
 const Roopatha = () => {
     const members = [
-        { name: "SR.ANNS S.H", role: "ANIMATOR", image: animator1, zoom: 1.4, pos: 'center 15%' },
+        { name: "SR.ANNS S.H", role: "ANIMATOR", image: animator1, zoom: 1.6, pos: 'center 10%' },
+        { name: "SR NIRMAL THERES S.M.C", role: "ANIMATOR", image: animator3, zoom: 1.8, pos: 'center 20%' },
         { name: "SR BLESSY D.S.T", role: "ANIMATOR", image: animator2, zoom: 1.4, pos: 'center 15%' },
-        { name: "SR NIRMAL THERES S.M.C", role: "ANIMATOR", image: animator3, zoom: 1.4, pos: 'center 15%' },
+
         { name: "SAM SUNNY", role: "Bharananganam", image: syndicate1, zoom: 1.2, pos: 'center 20%' },
         { name: "SIJO JOSE", role: "Cherpunkal", image: syndicate2, zoom: 1.5, pos: 'center 15%' },
         { name: "ANN MARIYA BABY", role: "Elanji", image: syndicate3, zoom: 1.2, pos: 'center 20%' },
