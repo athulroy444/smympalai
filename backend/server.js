@@ -8,6 +8,7 @@ const authRoutes = require('./routes/authRoutes');
 const dataRoutes = require('./routes/dataRoutes');
 const contentRoutes = require('./routes/contentRoutes');
 const unitRoutes = require('./routes/unitRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 dotenv.config();
 
@@ -33,11 +34,16 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+// Serve static files from 'uploads' folder
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/data', dataRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/unit', unitRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Test Route
 app.get('/', (req, res) => {

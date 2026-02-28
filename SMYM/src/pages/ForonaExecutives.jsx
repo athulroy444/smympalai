@@ -19,13 +19,13 @@ function ForonaExecutives() {
     // --- FORONA EXECUTIVES STATE ---
     const [selectedForona, setSelectedForona] = useState('');
     const [showForm, setShowForm] = useState(false);
-    const [formData, setFormData] = useState({ name: '', post: '', phone: '' });
+    const [formData, setFormData] = useState({ name: '', post: '', phone: '', image_url: '' });
 
     // --- UNIT EXECUTIVES STATE ---
     const [selectedUnitForona, setSelectedUnitForona] = useState('');
     const [selectedUnit, setSelectedUnit] = useState('');
     const [showUnitForm, setShowUnitForm] = useState(false);
-    const [unitFormData, setUnitFormData] = useState({ name: '', post: '', phone: '' });
+    const [unitFormData, setUnitFormData] = useState({ name: '', post: '', phone: '', image_url: '' });
 
     // Derived Data
     const currentForona = foronaList.find(f => f.name === selectedForona);
@@ -50,7 +50,7 @@ function ForonaExecutives() {
         const newExecs = [...foronaExecutives, { ...formData, id: Date.now() }];
         updateForonaExecutives(selectedForona, newExecs);
 
-        setFormData({ name: '', post: '', phone: '' });
+        setFormData({ name: '', post: '', phone: '', image_url: '' });
         setShowForm(false);
     };
 
@@ -74,7 +74,7 @@ function ForonaExecutives() {
         const newExecs = [...unitExecutives, { ...unitFormData, id: Date.now() }];
         updateUnitExecutives(selectedUnitForona, selectedUnit, newExecs);
 
-        setUnitFormData({ name: '', post: '', phone: '' });
+        setUnitFormData({ name: '', post: '', phone: '', image_url: '' });
         setShowUnitForm(false);
     };
 
@@ -144,6 +144,10 @@ function ForonaExecutives() {
                                                     </Col>
                                                     <Col md={4} className="mb-3">
                                                         <Form.Control type="text" name="phone" placeholder="Phone Number" value={formData.phone} onChange={handleInputChange} required />
+                                                    </Col>
+                                                    <Col md={12} className="mb-3">
+                                                        <Form.Control type="text" name="image_url" placeholder="Image URL or Path (e.g. /uploads/photo.jpg)" value={formData.image_url} onChange={handleInputChange} />
+                                                        <Form.Text className="text-muted">You can use paths from the assets or full URLs.</Form.Text>
                                                     </Col>
                                                 </Row>
                                                 <div className="d-flex justify-content-end">
@@ -251,6 +255,9 @@ function ForonaExecutives() {
                                                     </Col>
                                                     <Col md={4} className="mb-3">
                                                         <Form.Control type="text" name="phone" placeholder="Phone" value={unitFormData.phone} onChange={handleUnitInputChange} required />
+                                                    </Col>
+                                                    <Col md={12} className="mb-3">
+                                                        <Form.Control type="text" name="image_url" placeholder="Image URL or Path" value={unitFormData.image_url} onChange={handleUnitInputChange} />
                                                     </Col>
                                                 </Row>
                                                 <div className="d-flex justify-content-end">

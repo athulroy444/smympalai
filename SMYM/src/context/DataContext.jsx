@@ -25,6 +25,8 @@ export const DataProvider = ({ children }) => {
 
     // --- ROOPATHA EXECUTIVES ---
     const [roopathaExecutives, setRoopathaExecutives] = useState([]);
+    const [heroSlides, setHeroSlides] = useState([]);
+    const [siteSettings, setSiteSettings] = useState({});
 
     const updateRoopathaExecutive = async (id, updatedData) => {
         // Optimistic
@@ -73,77 +75,44 @@ export const DataProvider = ({ children }) => {
         }
     };
 
-    // --- LEGACY/MOCKED DATA (Preserved for existing features) ---
-    const [foronaList, setForonaList] = useState([
-        { name: "Aruvithura", executives: [], units: [] },
-        { name: "Bharananganam", executives: [], units: [] },
-        { name: "Cherpunkal", executives: [], units: [] },
-        { name: "Kozhuvanal", executives: [], units: [] },
-        { name: "Kadaplamattom", executives: [], units: [] },
-        { name: "Kothanalloor", executives: [], units: [] },
-        { name: "Koothattukulam", executives: [], units: [] },
-        { name: "Kuravilangad", executives: [], units: [] },
-        { name: "Pravithanam", executives: [], units: [] },
-        {
-            name: "Pala",
-            executives: [
-                { name: "Fr. Thomas", post: "Director" },
-                { name: "Albin Soby", post: "President" }
-            ],
-            units: [
-                { name: "Cathedral", executives: [{ name: "John Doe", post: "President" }, { name: "Jane Smith", post: "Secretary" }] },
-                { name: "Lalam", executives: [{ name: "Peter Parker", post: "President" }] },
-                { name: "Kadanad", executives: [] },
-                { name: "Pravithanam", executives: [] }
-            ]
-        },
-        { name: "Poonjar", executives: [], units: [] },
-        { name: "Moolamattom", executives: [], units: [] },
-        { name: "Thudanganad", executives: [], units: [] },
-        { name: "Teekoy", executives: [], units: [] },
-        { name: "Muttuchira", executives: [], units: [] },
-        { name: "Kadanad", executives: [], units: [] },
-        { name: "Ramapuram", executives: [], units: [] },
-        { name: "Kootickal", executives: [], units: [] },
-        { name: "Elanji", executives: [], units: [] },
-        { name: "Kaduthuruthy", executives: [], units: [] }
-    ]);
+    const [foronaList, setForonaList] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    // Use 127.0.0.1 to avoid Windows IPv6 localhost issues
     const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
 
     // --- FETCH FROM BACKEND ---
     useEffect(() => {
         const fetchContent = async () => {
-            try {
-                const actRes = await axios.get(`${API_BASE}/api/content/activities`);
-                if (Array.isArray(actRes.data)) {
-                    setActivities(actRes.data);
+            setLoading(true);
+            const safeFetch = async (url, setter, label, isArray = true) => {
+                try {
+                    const res = await axios.get(url);
+                    if (isArray) {
+                        setter(Array.isArray(res.data) ? res.data : []);
+                    } else {
+                        setter(res.data || {});
+                    }
+                    console.log(`DataContext: ${label} fetched.`);
+                } catch (err) {
+                    console.error(`DataContext: Error fetching ${label}:`, err.message);
                 }
+            };
 
-                const newsRes = await axios.get(`${API_BASE}/api/content/news`);
-                if (Array.isArray(newsRes.data)) {
-                    setNews(newsRes.data);
-                }
+            await Promise.all([
+                safeFetch(`${API_BASE}/api/content/activities`, setActivities, "Activities"),
+                safeFetch(`${API_BASE}/api/content/news`, setNews, "News"),
+                safeFetch(`${API_BASE}/api/content/events`, setEventsList, "Events"),
+                safeFetch(`${API_BASE}/api/content/executives`, setRoopathaExecutives, "Executives"),
+                safeFetch(`${API_BASE}/api/data/foronas`, setForonaList, "Foronas"),
+                safeFetch(`${API_BASE}/api/content/hero-slides`, setHeroSlides, "Hero Slides"),
+                safeFetch(`${API_BASE}/api/content/settings`, setSiteSettings, "Settings", false)
+            ]);
 
-                const evRes = await axios.get(`${API_BASE}/api/content/events`);
-                if (Array.isArray(evRes.data)) {
-                    setEventsList(evRes.data);
-                }
-
-                const execRes = await axios.get(`${API_BASE}/api/content/executives`);
-                if (Array.isArray(execRes.data)) {
-                    setRoopathaExecutives(execRes.data);
-                }
-
-                console.log("Content successfully fetched from DB.");
-            } catch (err) {
-                console.error("Error fetching content from DB:", err);
-            }
+            setLoading(false);
         };
 
         fetchContent();
-    }, []);
+    }, [API_BASE]);
 
     // --- ADD ACTIONS ---
     const addActivity = async (activityData) => {
@@ -234,31 +203,49 @@ export const DataProvider = ({ children }) => {
         });
     };
 
-    const updateUnitExecutives = (foronaName, unitName, newExecutives) => {
-        setForonaList(prevList => {
-            return prevList.map(forona => {
-                if (forona.name === foronaName) {
-                    return {
-                        ...forona,
-                        units: forona.units.map(u =>
-                            u.name === unitName ? { ...u, executives: newExecutives } : u
-                        )
-                    };
-                }
-                return forona;
-            });
-        });
+    const updateUnitExecutives = async (foronaName, unitName, newExecutives) => {
+        const forona = foronaList.find(f => f.name === foronaName);
+        if (!forona) return;
+        const unit = forona.units.find(u => u.name === unitName);
+        if (!unit) return;
+
+        await updateExecutivesDirectly('unit', unit.id, newExecutives);
     };
 
-    const updateForonaExecutives = (foronaName, newExecutives) => {
-        setForonaList(prevList => {
-            return prevList.map(forona => {
-                if (forona.name === foronaName) {
-                    return { ...forona, executives: newExecutives };
-                }
-                return forona;
+    const updateExecutivesDirectly = async (entityType, entityId, newExecutives) => {
+        try {
+            await axios.post(`${API_BASE}/api/data/executives`, {
+                entityType,
+                entityId,
+                executives: newExecutives
             });
-        });
+            // Update local state by refetching foronas
+            const res = await axios.get(`${API_BASE}/api/data/foronas`);
+            setForonaList(res.data);
+            return true;
+        } catch (err) {
+            console.error(`Failed to update ${entityType} executives`, err);
+            return false;
+        }
+    };
+
+    const updateForonaExecutives = async (foronaName, newExecutives) => {
+        const forona = foronaList.find(f => f.name === foronaName);
+        if (!forona) return;
+
+        try {
+            await axios.post(`${API_BASE}/api/data/executives`, {
+                entityType: 'forona',
+                entityId: forona.id,
+                executives: newExecutives
+            });
+
+            // Refetch
+            const res = await axios.get(`${API_BASE}/api/data/foronas`);
+            setForonaList(res.data);
+        } catch (err) {
+            console.error("Failed to update forona executives", err);
+        }
     };
 
     // --- UNIT ACTIONS (Members & Registration) ---
@@ -266,7 +253,7 @@ export const DataProvider = ({ children }) => {
     // FETCH MEMBERS
     const fetchMembers = async (unitId) => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/unit/members/${unitId}`);
+            const res = await axios.get(`${API_BASE}/api/unit/members/${unitId}`);
             return res.data;
         } catch (err) {
             console.error("Fetch members failed", err);
@@ -277,7 +264,7 @@ export const DataProvider = ({ children }) => {
     // ADD MEMBER
     const addMember = async (memberData) => {
         try {
-            const res = await axios.post('http://localhost:5000/api/unit/members', memberData);
+            const res = await axios.post(`${API_BASE}/api/unit/members`, memberData);
             return res.data;
         } catch (err) {
             console.error("Add member failed", err);
@@ -288,7 +275,7 @@ export const DataProvider = ({ children }) => {
     // DELETE MEMBER
     const deleteMember = async (id) => {
         try {
-            await axios.delete(`http://localhost:5000/api/unit/members/${id}`);
+            await axios.delete(`${API_BASE}/api/unit/members/${id}`);
             return true;
         } catch (err) {
             console.error("Delete member failed", err);
@@ -296,10 +283,41 @@ export const DataProvider = ({ children }) => {
         }
     };
 
+    // Parish Activities
+    const fetchUnitActivities = async (unitId) => {
+        try {
+            const res = await axios.get(`${API_BASE}/api/unit/activities/${unitId}`);
+            return res.data;
+        } catch (err) {
+            console.error("Fetch activities failed", err);
+            return [];
+        }
+    };
+
+    const addUnitActivity = async (data) => {
+        try {
+            const res = await axios.post(`${API_BASE}/api/unit/activities`, data);
+            return res.data;
+        } catch (err) {
+            console.error("Add activity failed", err);
+            return null;
+        }
+    };
+
+    const deleteUnitActivity = async (id) => {
+        try {
+            await axios.delete(`${API_BASE}/api/unit/activities/${id}`);
+            return true;
+        } catch (err) {
+            console.error("Delete activity failed", err);
+            return false;
+        }
+    };
+
     // FETCH EVENTS (From DB for registration)
     const fetchEvents = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/unit/events');
+            const res = await axios.get(`${API_BASE}/api/unit/events`);
             return res.data;
         } catch (err) {
             console.error("Fetch events failed", err);
@@ -310,7 +328,7 @@ export const DataProvider = ({ children }) => {
     // REGISTER FOR EVENT
     const registerForEvent = async (registrationData) => {
         try {
-            await axios.post('http://localhost:5000/api/unit/register', registrationData);
+            await axios.post(`${API_BASE}/api/unit/register`, registrationData);
             return true;
         } catch (err) {
             console.error("Registration failed", err);
@@ -321,11 +339,86 @@ export const DataProvider = ({ children }) => {
     // FETCH EXISTING REGISTRATIONS
     const fetchRegistrations = async (unitId) => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/unit/registrations/${unitId}`);
+            const res = await axios.get(`${API_BASE}/api/unit/registrations/${unitId}`);
             return res.data;
         } catch (err) {
             console.error("Fetch registrations failed", err);
             return [];
+        }
+    };
+
+    // --- ADMIN ACTIONS ---
+    const fetchAllMembers = async () => {
+        try {
+            const res = await axios.get(`${API_BASE}/api/admin/members`);
+            return res.data;
+        } catch (err) {
+            console.error("Fetch all members failed", err);
+            return [];
+        }
+    };
+
+    const fetchAllExecutives = async () => {
+        try {
+            const res = await axios.get(`${API_BASE}/api/admin/executives`);
+            return res.data;
+        } catch (err) {
+            console.error("Fetch all executives failed", err);
+            return [];
+        }
+    };
+
+    const fetchAllRegistrations = async () => {
+        try {
+            const res = await axios.get(`${API_BASE}/api/admin/registrations`);
+            return res.data;
+        } catch (err) {
+            console.error("Fetch all registrations failed", err);
+            return [];
+        }
+    };
+
+    const fetchAdminStats = async () => {
+        try {
+            const res = await axios.get(`${API_BASE}/api/admin/stats`);
+            return res.data;
+        } catch (err) {
+            console.error("Fetch admin stats failed", err);
+            return { units: 0, foronas: 0, members: 0, events: 0 };
+        }
+    };
+
+    const addHeroSlide = async (slideData) => {
+        try {
+            await axios.post(`${API_BASE}/api/content/hero-slides`, slideData);
+            const res = await axios.get(`${API_BASE}/api/content/hero-slides`);
+            setHeroSlides(res.data);
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
+    };
+
+    const deleteHeroSlide = async (id) => {
+        try {
+            await axios.delete(`${API_BASE}/api/content/hero-slides/${id}`);
+            setHeroSlides(prev => prev.filter(s => s.id !== id));
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
+    };
+
+    const updateSetting = async (key, value) => {
+        try {
+            await axios.post(`${API_BASE}/api/content/settings`, { key, value });
+            setSiteSettings(prev => ({ ...prev, [key]: value }));
+            return true;
+        } catch (err) {
+            console.error(err);
+            return false;
         }
     };
 
@@ -335,6 +428,7 @@ export const DataProvider = ({ children }) => {
             registerUnit,
             updateUnitExecutives,
             updateForonaExecutives,
+            updateExecutivesDirectly,
             activities,
             news,
             addActivity,
@@ -342,6 +436,9 @@ export const DataProvider = ({ children }) => {
             fetchMembers, // New
             addMember, // New
             deleteMember, // New
+            fetchUnitActivities,
+            addUnitActivity,
+            deleteUnitActivity,
             fetchEvents, // New
             registerForEvent, // New
 
@@ -356,7 +453,17 @@ export const DataProvider = ({ children }) => {
             addEvent, // New
             deleteEvent, // New
             karmaRekha, // New
-            updateKarmaRekha // New
+            updateKarmaRekha, // New
+            fetchAllMembers,
+            fetchAllExecutives,
+            fetchAllRegistrations,
+            fetchAdminStats,
+            heroSlides,
+            siteSettings,
+            addHeroSlide,
+            deleteHeroSlide,
+            updateSetting,
+            loading
         }}>
             {children}
         </DataContext.Provider>

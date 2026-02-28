@@ -1,4 +1,5 @@
 import React from 'react';
+import { useData } from '../../context/DataContext';
 import patronImg from '../../assets/mar joseph.jpeg';
 import msgrImg from '../../assets/vethanath.jpeg';
 import dirImg from '../../assets/fr mani.jpeg';
@@ -17,23 +18,24 @@ import statevicepresidentImg from '../../assets/adv.prathheksha.jpeg';
 import statetreasurerImg from '../../assets/nikhil.jpeg';
 
 const SecretariatHome = () => {
+    const { siteSettings } = useData();
     const members = [
-        { name: "MAR. JOSEPH KALLARANGAT", role: "PATRON", image: patronImg, pos: 'center 13%', special: true },
-        { name: "MSGR. SEBASTIAN VETHANATH", role: "VG. Incharge", image: msgrImg, pos: 'center 13%' },
-        { name: "FR. MANI KOZHUPPANKUTTY", role: "DIRECTOR", image: dirImg, pos: 'center 13%' },
-        { name: "SR. NAVEENA CMC", role: "JOINT DIRECTOR", image: jointdirImg, pos: 'center 13%' },
-        { name: "MIJO JOY", role: "PRESIDENT", image: presidentImg, pos: 'center 53%' },
-        { name: "SONA A. MATHEW", role: "GEN. SECRETARY", image: gensecretaryImg },
-        { name: "RACHEL MARY CHARLES", role: "VICE PRESIDENT", image: vicepresidentImg1 },
-        { name: "ABIN THOMAS", role: "VICE PRESIDENT", image: vicepresidentImg2 },
-        { name: "ADON TOMMY", role: "SECRETARY", image: secretaryImg },
-        { name: "RIYA SABU", role: "JOINT SECRETARY", image: jointsecretaryImg },
-        { name: "JOSE CHARLES", role: "TREASURER", image: treasurerImg },
-        { name: "ROBIN T. JOSE", role: "KCYM STATE SYNDICATE", image: kcymsyndicateImg1 },
-        { name: "SENJU JACOB", role: "KCYM STATE SYNDICATE", image: kcymsyndicateImg2 },
-        { name: "ADV. SAM SUNNY", role: "SMYM GLOBAL PRESIDENT", image: globalpresidentImg },
-        { name: "ADV. PRATEEKSHA RAJ", role: "SMYM STATE VICEPRESIDENT", image: statevicepresidentImg },
-        { name: "NIKHIL FRANCIS", role: "SMYM STATE TREASURER", image: statetreasurerImg },
+        { name: "MAR. JOSEPH KALLARANGAT", role: "PATRON", image: patronImg, pos: 'center 10%', zoom: 1.2, special: true },
+        { name: "MSGR. SEBASTIAN VETHANATH", role: "VG. Incharge", image: msgrImg, pos: 'center 9%', zoom: 1.0 },
+        { name: "FR. MANI KOZHUPPANKUTTY", role: "DIRECTOR", image: dirImg, pos: 'center 28%', zoom: 1.0 },
+        { name: "SR. NAVEENA CMC", role: "JOINT DIRECTOR", image: jointdirImg, pos: 'center 13%', zoom: 1.2 },
+        { name: "MIJO JOY", role: "PRESIDENT", image: presidentImg, pos: 'center 53%', zoom: 1.2 },
+        { name: "SONA A. MATHEW", role: "GEN. SECRETARY", image: gensecretaryImg, pos: 'center 68%', zoom: 1.2 },
+        { name: "RACHEL MARY CHARLES", role: "VICE PRESIDENT", image: vicepresidentImg1, zoom: 1.2 },
+        { name: "ABIN THOMAS", role: "VICE PRESIDENT", image: vicepresidentImg2, zoom: 1.2 },
+        { name: "ADON TOMMY", role: "SECRETARY", image: secretaryImg, zoom: 1.2 },
+        { name: "RIYA SABU", role: "JOINT SECRETARY", image: jointsecretaryImg, pos: 'center 48%', zoom: 1.6 },
+        { name: "JOSE CHARLES", role: "TREASURER", image: treasurerImg, zoom: 1.2 },
+        { name: "ROBIN T. JOSE", role: "KCYM STATE SYNDICATE", image: kcymsyndicateImg1, zoom: 1.2 },
+        { name: "SENJU JACOB", role: "KCYM STATE SYNDICATE", image: kcymsyndicateImg2, pos: 'center 28%', zoom: 1.2 },
+        { name: "ADV. SAM SUNNY", role: "SMYM GLOBAL PRESIDENT", image: globalpresidentImg, pos: 'center 98%', zoom: 1.2 },
+        { name: "ADV. PRATEEKSHA RAJ", role: "SMYM STATE VICEPRESIDENT", image: statevicepresidentImg, zoom: 1.2 },
+        { name: "NIKHIL FRANCIS", role: "SMYM STATE TREASURER", image: statetreasurerImg, zoom: 1.2 },
     ];
 
     return (
@@ -44,7 +46,9 @@ const SecretariatHome = () => {
                 <div style={styles.topBar}></div>
                 <h1 style={styles.mainTitle}>SMYM-KCYM EPARCHY OF PALAI</h1>
                 <div style={styles.subTitleBox}>
-                    <span style={styles.subTitle}>EPARCHIAL EXECUTIVE 2026 - 2028</span>
+                    <span style={styles.subTitle}>
+                        {siteSettings.welcome_text || "EPARCHIAL EXECUTIVE 2026 - 2028"}
+                    </span>
                 </div>
             </header>
 
@@ -57,6 +61,7 @@ const SecretariatHome = () => {
                                 alt={m.name}
                                 style={{
                                     ...styles.img,
+                                    transform: `scale(${m.zoom || 1.2})`,
                                     // Default to top-center to ensure faces are visible
                                     objectPosition: m.pos || 'center 15%'
                                 }}
@@ -84,25 +89,24 @@ const SecretariatHome = () => {
 
 const styles = {
     container: {
-        backgroundColor: '#050a18',
-        color: '#f8fafc',
+        backgroundColor: '#f8f9fa',
+        color: '#1e293b',
         minHeight: '100vh',
         padding: '60px 15px',
         fontFamily: "'Inter', sans-serif",
-        backgroundImage: 'radial-gradient(circle at 50% 0%, #1a2a4a 0%, #050a18 100%)',
     },
     header: { textAlign: 'center', marginBottom: '50px' },
-    topBar: { width: '40px', height: '3px', backgroundColor: '#fbbf24', margin: '0 auto 15px' },
-    mainTitle: { fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', fontWeight: '900', color: '#fff', letterSpacing: '-0.02em' },
+    topBar: { width: '40px', height: '3px', backgroundColor: '#E14B1F', margin: '0 auto 15px' },
+    mainTitle: { fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', fontWeight: '900', color: '#1e293b', letterSpacing: '-0.02em' },
     subTitleBox: {
         marginTop: '10px',
         padding: '6px 16px',
-        background: 'rgba(251, 191, 36, 0.1)',
+        background: 'rgba(225, 75, 31, 0.05)',
         borderRadius: '50px',
         display: 'inline-block',
-        border: '1px solid rgba(251, 191, 36, 0.2)'
+        border: '1px solid rgba(225, 75, 31, 0.15)'
     },
-    subTitle: { fontSize: '0.8rem', color: '#fbbf24', fontWeight: '700', letterSpacing: '1px' },
+    subTitle: { fontSize: '0.8rem', color: '#E14B1F', fontWeight: '700', letterSpacing: '1px' },
 
     grid: {
         display: 'grid',
@@ -113,24 +117,22 @@ const styles = {
     },
     card: {
         position: 'relative',
-        background: 'rgba(255, 255, 255, 0.04)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: '14px',
-        padding: '10px',
+        background: '#ffffff',
+        border: '1px solid #edf2f7',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+        borderRadius: '16px',
+        padding: '12px',
         transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
         cursor: 'pointer',
         overflow: 'hidden',
     },
     imageContainer: {
-        // Height increased to 210px for a more professional portrait aspect ratio
         height: '210px',
-        borderRadius: '10px',
+        borderRadius: '12px',
         overflow: 'hidden',
         position: 'relative',
         marginBottom: '12px',
-        backgroundColor: '#0f172a',
+        backgroundColor: '#f1f5f9',
     },
     img: {
         width: '100%',
@@ -141,7 +143,7 @@ const styles = {
     imageOverlay: {
         position: 'absolute',
         inset: 0,
-        background: 'linear-gradient(to bottom, transparent 65%, rgba(0,0,0,0.6) 100%)',
+        background: 'linear-gradient(to bottom, transparent 70%, rgba(0,0,0,0.5) 100%)',
     },
     infoBox: {
         padding: '0 4px 6px',
@@ -156,7 +158,7 @@ const styles = {
     nameText: {
         fontSize: '0.85rem',
         fontWeight: '700',
-        color: '#fff',
+        color: '#1e293b',
         lineHeight: '1.3',
     },
     glassLine: {
@@ -164,8 +166,8 @@ const styles = {
         bottom: 0,
         left: 0,
         width: '0%',
-        height: '3px',
-        background: '#fbbf24',
+        height: '4px',
+        background: '#E14B1F',
         transition: 'width 0.4s ease',
     }
 };
@@ -187,10 +189,9 @@ const hoverEffects = `
   }
 
   .glass-card:hover {
-    background: rgba(255, 255, 255, 0.08);
     transform: translateY(-8px);
-    border: 1px solid rgba(251, 191, 36, 0.4);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    border: 1px solid #E14B1F !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   }
 
   .glass-card:hover img {
@@ -202,8 +203,8 @@ const hoverEffects = `
   }
 
   .special-card {
-    border: 1px solid rgba(251, 191, 36, 0.3);
-    background: rgba(251, 191, 36, 0.05);
+    border: 1px solid rgba(225, 75, 31, 0.2) !important;
+    background: #fffafa !important;
   }
 `;
 

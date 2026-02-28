@@ -13,6 +13,7 @@ router.get('/foronas', async (req, res) => {
 
         const [units] = await db.execute('SELECT * FROM units');
         const [executives] = await db.execute('SELECT * FROM executives');
+        const [unitActivities] = await db.execute('SELECT * FROM unit_activities');
 
         const result = foronas.map(f => {
             return {
@@ -22,7 +23,8 @@ router.get('/foronas', async (req, res) => {
                     .filter(u => u.forona_id === f.id)
                     .map(u => ({
                         ...u,
-                        executives: executives.filter(e => e.entity_type === 'unit' && e.entity_id === u.id)
+                        executives: executives.filter(e => e.entity_type === 'unit' && e.entity_id === u.id),
+                        activities: unitActivities.filter(a => a.unit_id === u.id)
                     }))
             };
         });
@@ -52,10 +54,10 @@ router.post('/executives', async (req, res) => {
 
         // 2. Insert new ones
         if (executives && executives.length > 0) {
-            const values = executives.map(e => [e.name, e.post, e.phone || '', entityType, entityId]);
+            const values = executives.map(e => [e.name, e.post, e.phone || '', e.image_url || '', entityType, entityId]);
             // Bulk insert
             await db.query(
-                'INSERT INTO executives (name, post, phone, entity_type, entity_id) VALUES ?',
+                'INSERT INTO executives (name, post, phone, image_url, entity_type, entity_id) VALUES ?',
                 [values]
             );
         }

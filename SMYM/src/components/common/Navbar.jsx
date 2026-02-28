@@ -1,4 +1,6 @@
+import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
@@ -6,13 +8,13 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Link, useNavigate } from 'react-router-dom';
 import TopBar from './TopBar';
 import smymLogo from "../../assets/NavLogo.png";
-import { PersonCircle, BoxArrowRight, People } from 'react-bootstrap-icons';
+import { PersonCircle, People, Search } from 'react-bootstrap-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useData } from '../../context/DataContext';
 
 function AppNavbar() {
   const { user, logout } = useAuth();
-  const { foronaList } = useData();
+  const { foronaList, siteSettings } = useData();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -25,8 +27,6 @@ function AppNavbar() {
       <TopBar />
       <Navbar expand="lg" className="sticky-top glass-navbar" style={{ padding: '15px 0' }}>
         <Container>
-          {/* ... (Keep brand logo code) */}
-
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
             <img
               src={smymLogo}
@@ -36,7 +36,9 @@ function AppNavbar() {
               alt="SMYM Logo"
             />
             <div className="d-flex flex-column brand-text">
-              <span className="brand-name" style={{ fontWeight: 800, fontSize: '1.2rem', color: '#E14B1F', lineHeight: 1.1 }}>SMYM</span>
+              <span className="brand-name" style={{ fontWeight: 800, fontSize: '1.2rem', color: '#E14B1F', lineHeight: 1.1 }}>
+                {siteSettings.site_title || "SMYM"}
+              </span>
               <span className="brand-sub" style={{ fontSize: '0.75rem', color: '#1A1A1A', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>Eparchy of Palai</span>
             </div>
           </Navbar.Brand>
@@ -64,9 +66,9 @@ function AppNavbar() {
               transform: translateX(-50%);
             }
             .nav-link-custom:hover::after {
-              width: 70%;
+                width: 70%;
             }
-            .forona-scroll-menu {
+            .forana-scroll-menu {
               max-height: 400px;
               overflow-y: auto;
               min-width: 220px;
@@ -94,46 +96,60 @@ function AppNavbar() {
                 <NavDropdown.Item as={Link} to="/activities">Social Service</NavDropdown.Item>
               </NavDropdown>
 
-              <NavDropdown title="Forona" id="forona-dropdown">
-                <div className="forona-scroll-menu">
-                  <NavDropdown.Item as={Link} to="/forona" className="text-primary border-bottom pb-2 mb-2">
-                    Browse All Units
+              <NavDropdown title="Forana" id="forona-dropdown">
+                <div className="forana-scroll-menu">
+                  <NavDropdown.Item as={Link} to="/forona" style={{ color: '#E14B1F', fontWeight: 'bold' }} className="border-bottom py-2 d-flex align-items-center">
+                    <Search size={16} className="me-2" /> Browse Units
                   </NavDropdown.Item>
-                  <NavDropdown.Header className="text-muted small fw-bold">Select Forona</NavDropdown.Header>
-                  {foronaList.map((forona, index) => (
+
+                  <NavDropdown.Header className="text-muted small fw-bold mt-2">Explore Foronas</NavDropdown.Header>
+                  {foronaList && foronaList.map((forona, index) => (
                     <NavDropdown.Item
                       key={index}
                       as={Link}
-                      to="/forona"
-                      onClick={() => {
-                        // We can't easily pass state through NavDropdown.Item to Forona page without search params or context
-                        // But we can use localStorage or a simple trick if needed
-                        localStorage.setItem('selected_forona', forona.name);
-                      }}
-                      style={{ fontSize: '0.8rem', textTransform: 'capitalize' }}
+                      to={`/forona?name=${encodeURIComponent(forona.name)}`}
+                      style={{ fontSize: '0.85rem', textTransform: 'capitalize' }}
                     >
                       {forona.name}
                     </NavDropdown.Item>
                   ))}
+
                   <NavDropdown.Divider />
-                  <NavDropdown.Item as={Link} to="/forona-executives" style={{ fontSize: '0.8rem' }}>
-                    Manage Executives
+                  <NavDropdown.Item as={Link} to="/forona-executives" style={{ fontSize: '0.85rem' }}>
+                    <People size={14} className="me-2" /> Manage Executives
                   </NavDropdown.Item>
                 </div>
               </NavDropdown>
+
               <Nav.Link as={Link} to="/contact" className="nav-link-custom">Contact</Nav.Link>
             </Nav>
 
-            {user ? (
-              <Link to="/profile" className="ms-3 text-primary d-flex align-items-center" style={{ textDecoration: 'none' }}>
-                <PersonCircle size={32} />
-              </Link>
-            ) : (
-              <Link to="/login" className="ms-3">
-                <Button variant="primary" size="sm">Login</Button>
-              </Link>
-            )}
-
+            <div className="d-flex align-items-center ms-lg-3">
+              {user ? (
+                <NavDropdown
+                  title={<PersonCircle size={28} className="text-primary" />}
+                  id="user-nav-dropdown"
+                  align="end"
+                >
+                  {user.role === 'admin' && (
+                    <NavDropdown.Item as={Link} to="/admin-dashboard" className="text-primary fw-bold">
+                      Admin Dashboard
+                    </NavDropdown.Item>
+                  )}
+                  <NavDropdown.Item as={Link} to="/profile">My Profile</NavDropdown.Item>
+                  <NavDropdown.Divider />
+                  <NavDropdown.Item onClick={handleLogout} className="text-danger">
+                    Logout
+                  </NavDropdown.Item>
+                </NavDropdown>
+              ) : (
+                <Link to="/login">
+                  <Button variant="primary" size="sm" className="px-3 rounded-pill fw-bold" style={{ backgroundColor: '#E14B1F', border: 'none' }}>
+                    Login
+                  </Button>
+                </Link>
+              )}
+            </div>
           </Navbar.Collapse>
         </Container>
       </Navbar>

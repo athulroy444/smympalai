@@ -161,7 +161,16 @@ h6 {
 
 @media (max-width: 768px) {
     .page-header {
-        padding: 2.5rem 0;
+        padding: 2rem 0;
+        margin-bottom: 1rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem !important;
+    }
+
+    .page-header p {
+        font-size: 0.9rem !important;
     }
 }
 
@@ -181,21 +190,109 @@ h6 {
 
 /* Hero Carousel Sizing */
 .hero-carousel-item {
-    height: 65vh;
+    height: 75vh;
+    min-height: 500px;
     position: relative;
     background-color: #000;
+    overflow: hidden;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+.hero-img {
+    height: 100% !important;
+    object-fit: cover;
+    object-position: center;
+}
+
+@media (max-width: 991px) {
+    .hero-carousel-item {
+        height: 60vh;
+        min-height: 400px;
+    }
 }
 
 @media (max-width: 768px) {
     .hero-carousel-item {
-        height: 45vh;
-        min-height: 300px;
+        height: auto;
+        min-height: auto;
+        aspect-ratio: 16/9;
+        /* Maintain aspect ratio on mobile */
+    }
+
+    .hero-img {
+        object-fit: contain !important;
+        /* See full slide on mobile */
+        height: 100% !important;
+        background-color: #000;
     }
 
     .display-4,
     .display-5,
     .display-6 {
-        font-size: 2.2rem !important;
+        font-size: 1.8rem !important;
+    }
+
+    .brand-text {
+        margin-left: 8px !important;
+    }
+
+    .brand-name {
+        font-size: 1.1rem !important;
+    }
+
+    .brand-sub {
+        font-size: 0.6rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-carousel-item {
+        aspect-ratio: 4/3;
+        /* Slightly taller for small phones */
+    }
+
+    .section-padding {
+        padding: 40px 0;
+    }
+
+    /* Better spacing for mobile cards */
+    .card {
+        margin-bottom: 15px;
+    }
+
+    /* Make buttons more finger-friendly */
+    .btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Global comfortable mobile tweaks */
+@media (max-width: 576px) {
+    body {
+        font-size: 14px;
+    }
+
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    h2 {
+        font-size: 1.5rem !important;
+    }
+
+    h3 {
+        font-size: 1.25rem !important;
     }
 }
 

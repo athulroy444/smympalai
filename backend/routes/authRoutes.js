@@ -1,134 +1,124 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { readDb, writeDb } = require('../utils/jsonDb');
+const db = require('../config/db');
 
-// REGISTER UNIT (Simplified)
+// Helper to generate JWT tokens
+const generateToken = (user) => {
+    return jwt.sign(
+        { id: user.id, role: user.role, entityId: user.entity_id },
+        process.env.JWT_SECRET || 'secret',
+        { expiresIn: '24h' }
+    );
+};
+
+/**
+ * @route   POST /api/auth/register
+ * @desc    Register a new Unit or Forona user (PLAIN TEXT VERSION)
+ */
 router.post('/register', async (req, res) => {
-    const { unitName, password, foronaId } = req.body;
-
-    if (!unitName || !password) {
-        return res.status(400).json({ message: "Unit Name and Password required" });
-    }
+    console.log("--- Registration Attempt (Plain Text) ---");
 
     try {
-        const db = await readDb();
-        if (!db.users) db.users = [];
-        if (!db.units) db.units = [];
+        const rawUsername = req.body.username || req.body.unitName;
+        const { password, role, entityId } = req.body;
 
-        // Check if exists
-        if (db.users.find(u => u.username === unitName)) {
-            return res.status(400).json({ message: "User already exists" });
+        if (!rawUsername || !password) {
+            return res.status(400).json({ message: "Unit Name and Password required" });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const username = rawUsername.trim();
 
-        let unitId = Date.now();
+        if (!role) {
+            return res.status(400).json({ message: "Role is required" });
+        }
 
-        // Add Unit
-        db.units.push({ id: unitId, name: unitName, forona_id: foronaId || null });
+        // 1. Check if user account already exists
+        const [existing] = await db.execute('SELECT id FROM users WHERE LOWER(username) = LOWER(?)', [username]);
+        if (existing.length > 0) {
+            return res.status(400).json({ message: "Account already exists for this name." });
+        }
 
-        // Add User
-        db.users.push({
-            id: Date.now() + 1,
-            username: unitName,
-            password_hash: hashedPassword,
-            role: 'unit',
-            entity_id: unitId
-        });
+        // 2. Specialty logic for 'unit' role registration
+        let targetEntityId = entityId;
 
-        await writeDb(db);
+        if (role === 'unit' && entityId) {
+            const [units] = await db.execute(
+                'SELECT id FROM units WHERE LOWER(name) = LOWER(?) AND forona_id = ?',
+                [username, entityId]
+            );
 
-        res.status(201).json({ message: "Unit Registered Successfully" });
+            if (units.length > 0) {
+                targetEntityId = units[0].id;
+            } else {
+                const [result] = await db.execute(
+                    'INSERT INTO units (name, forona_id) VALUES (?, ?)',
+                    [username, entityId]
+                );
+                targetEntityId = result.insertId;
+            }
+        }
+
+        // 3. Store Password directly (PLAIN TEXT - INSECURE)
+        await db.execute(
+            'INSERT INTO users (username, password_hash, role, entity_id) VALUES (?, ?, ?, ?)',
+            [username, password, role, targetEntityId || null]
+        );
+
+        console.log(`Successfully registered user (Plain Text): ${username}`);
+        res.status(201).json({ message: "Registration successful! Password stored in plain text." });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Server Error", error: err.message });
+        console.error("Registration Error:", err);
+        res.status(500).json({ message: "Server error: " + err.message });
     }
 });
 
-// LOGIN
+/**
+ * @route   POST /api/auth/login
+ * @desc    Authenticate user using Plain Text
+ */
 router.post('/login', async (req, res) => {
-    const { username, password, role } = req.body;
+    const usernameInput = req.body.username?.trim();
+    const passwordInput = req.body.password;
+    const roleInput = req.body.role;
 
-    // Manual Override for Admin Login
-    if (role === 'admin' && username === 'smympalai' && password === 'smymroopatha') {
-        const token = jwt.sign(
-            { id: 999, role: 'admin', entityId: null },
-            process.env.JWT_SECRET || 'secret',
-            { expiresIn: '1h' }
-        );
-        return res.json({
-            token,
-            user: {
-                id: 999,
-                name: 'smympalai',
-                role: 'admin',
-                entityId: null
-            }
-        });
-    }
-
-    // Manual Override for Unit Login (Cathedral)
-    if (role === 'unit' && username === 'Cathedral' && password === 'password') {
-        const token = jwt.sign(
-            { id: 100, role: 'unit', entityId: 1 },
-            process.env.JWT_SECRET || 'secret',
-            { expiresIn: '1h' }
-        );
-        return res.json({
-            token,
-            user: {
-                id: 100,
-                name: 'Cathedral',
-                role: 'unit',
-                entityId: 1
-            }
-        });
+    if (!usernameInput || !passwordInput || !roleInput) {
+        return res.status(400).json({ message: "Missing credentials" });
     }
 
     try {
-        const db = await readDb();
-        const users = db.users || [];
-
-        const user = users.find(u => u.username === username && u.role === role);
-
-        if (!user) {
-            return res.status(400).json({ message: "Invalid Credentials" });
-        }
-
-        // Check Password
-        // Note: In mocked DB.json, verify format. 
-        // If password_hash is not a real bcrypt hash (e.g. from my init), compare might fail.
-        // But for new registrations it will work.
-        // For init user 'Cathedral' in json, let's assume it won't match standard bcrypt unless I generated it.
-        // But manual override handles Cathedral.
-
-        const isMatch = await bcrypt.compare(password, user.password_hash);
-        if (!isMatch) {
-            return res.status(400).json({ message: "Invalid Credentials" });
-        }
-
-        // Generate Token
-        const token = jwt.sign(
-            { id: user.id, role: user.role, entityId: user.entity_id },
-            process.env.JWT_SECRET || 'secret',
-            { expiresIn: '1h' }
+        const [users] = await db.execute(
+            'SELECT * FROM users WHERE LOWER(username) = LOWER(?) AND role = ?',
+            [usernameInput, roleInput]
         );
 
+        if (users.length === 0) {
+            return res.status(401).json({ message: "Invalid username or role." });
+        }
+
+        const user = users[0];
+
+        // Match pass (Direct Comparison)
+        // Note: Supporting both hashed and plain text for existing accounts if possible, 
+        // but for simplicity here we do direct check.
+        if (passwordInput !== user.password_hash) {
+            return res.status(401).json({ message: "Incorrect password." });
+        }
+
+        const token = generateToken(user);
         res.json({
             token,
             user: {
                 id: user.id,
-                name: user.username,
+                username: user.username,
                 role: user.role,
                 entityId: user.entity_id
             }
         });
 
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Server Error" });
+        console.error("Login Error:", err);
+        res.status(500).json({ message: "Internal server error during login." });
     }
 });
 

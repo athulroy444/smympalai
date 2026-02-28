@@ -10,7 +10,7 @@ function Profile() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const {
-        foronaList, updateUnitExecutives, fetchMembers,
+        foronaList, updateExecutivesDirectly, fetchMembers,
         addMember, deleteMember, fetchEvents,
         registerForEvent, fetchRegistrations
     } = useData();
@@ -29,22 +29,37 @@ function Profile() {
     const [showProofModal, setShowProofModal] = useState(false);
     const [proofEvent, setProofEvent] = useState(null);
 
+    // Parish Activities
+    const [unitActivities, setUnitActivities] = useState([]);
+    const [showActivityForm, setShowActivityForm] = useState(false);
+    const [activityFormData, setActivityFormData] = useState({ title: '', description: '', date: '' });
+    const { fetchUnitActivities, addUnitActivity, deleteUnitActivity } = useData();
+
     // --- EFFECTS ---
     useEffect(() => {
         const loadInitialData = async () => {
             if (user?.role === 'unit' && user?.entityId) {
-                const [memberData, eventData, regData] = await Promise.all([
+                const [memberData, eventData, regData, actData] = await Promise.all([
                     fetchMembers(user.entityId),
                     fetchEvents(),
-                    fetchRegistrations(user.entityId)
+                    fetchRegistrations(user.entityId),
+                    fetchUnitActivities(user.entityId)
                 ]);
                 setMembers(memberData);
                 setEvents(eventData);
                 setRegistrations(regData);
+                setUnitActivities(actData);
 
-                // Legacy logic to find executives from local context
-                const found = foronaList.flatMap(f => f.units).find(u => u.name === user.name);
-                if (found) setExecutives(found.executives || []);
+                // Find executives for this specific unit ID
+                let foundExecs = [];
+                for (const forona of foronaList) {
+                    const unit = forona.units.find(u => u.id === user.entityId);
+                    if (unit) {
+                        foundExecs = unit.executives || [];
+                        break;
+                    }
+                }
+                setExecutives(foundExecs);
             }
         };
         loadInitialData();
@@ -70,13 +85,23 @@ function Profile() {
         }
     };
 
-    const handleExecSubmit = (e) => {
+    const handleExecSubmit = async (e) => {
         e.preventDefault();
         const newExecs = [...executives, { ...execFormData, id: Date.now() }];
-        setExecutives(newExecs);
-        // Assuming updateUnitExecutives is a global sync function
-        setExecFormData({ name: '', post: '' });
-        setShowExecForm(false);
+        const success = await updateExecutivesDirectly('unit', user.entityId, newExecs);
+        if (success) {
+            setExecutives(newExecs);
+            setExecFormData({ name: '', post: '' });
+            setShowExecForm(false);
+        }
+    };
+
+    const handleExecDelete = async (id) => {
+        if (window.confirm("Delete this executive?")) {
+            const newExecs = executives.filter(ex => ex.id !== id);
+            const success = await updateExecutivesDirectly('unit', user.entityId, newExecs);
+            if (success) setExecutives(newExecs);
+        }
     };
 
     const confirmRegistration = async () => {
@@ -89,6 +114,23 @@ function Profile() {
             const regData = await fetchRegistrations(user.entityId);
             setRegistrations(regData);
             setShowModal(false);
+        }
+    };
+
+    const handleActivitySubmit = async (e) => {
+        e.preventDefault();
+        const result = await addUnitActivity({ ...activityFormData, unitId: user.entityId });
+        if (result) {
+            setUnitActivities([result, ...unitActivities]);
+            setActivityFormData({ title: '', description: '', date: '' });
+            setShowActivityForm(false);
+        }
+    };
+
+    const handleDeleteActivity = async (id) => {
+        if (window.confirm("Delete this activity report?")) {
+            const success = await deleteUnitActivity(id);
+            if (success) setUnitActivities(unitActivities.filter(a => a.id !== id));
         }
     };
 
@@ -224,13 +266,13 @@ function Profile() {
                                                                 <Button variant="success" className="action-btn" disabled>
                                                                     <CheckCircle className="me-2" /> {regCount} Members
                                                                 </Button>
-                                                                <Button variant="link" className="text-primary text-decoration-none small" onClick={() => viewProof(event)}>
+                                                                <Button variant="link" className="text-primary text-decoration-none small">
                                                                     <FileEarmarkText className="me-1" /> Download Receipt
                                                                 </Button>
                                                             </div>
                                                         </div>
                                                     ) : (
-                                                        <Button variant="primary" className="w-100 mt-4 action-btn" onClick={() => openRegistrationModal(event.id)}>
+                                                        <Button variant="primary" className="w-100 mt-4 action-btn" onClick={() => { setSelectedEventId(event.id); setShowModal(true); }}>
                                                             Enroll Members
                                                         </Button>
                                                     )}
@@ -242,10 +284,178 @@ function Profile() {
                             </Row>
                         </div>
                     </Tab>
+
+                    <Tab eventKey="unitActivities" title={<><FileEarmarkText className="me-2" />Parish Activities</>}>
+                        <div className="py-4">
+                            <div className="d-flex justify-content-between align-items-center mb-4">
+                                <h5 className="fw-bold mb-0">Parish Youth Activities</h5>
+                                <Button variant="primary" className="action-btn" onClick={() => setShowActivityForm(true)}>
+                                    <Plus size={20} /> Add Activity
+                                </Button>
+                            </div>
+
+                            {unitActivities.length === 0 ? (
+                                <div className="text-center py-5 bg-white rounded-4 shadow-sm">
+                                    <FileEarmarkText size={40} className="text-muted mb-3 opacity-25" />
+                                    <p className="text-muted">No activities recorded yet. Start by adding one!</p>
+                                </div>
+                            ) : (
+                                <Row>
+                                    {unitActivities.map(act => (
+                                        <Col md={6} key={act.id} className="mb-4">
+                                            <Card className="border-0 shadow-sm h-100 bg-white">
+                                                <Card.Body className="p-4">
+                                                    <div className="d-flex justify-content-between align-items-start mb-2">
+                                                        <Badge bg="primary-soft" className="text-primary border border-primary-subtle">
+                                                            {act.activity_date ? new Date(act.activity_date).toLocaleDateString('en-GB') : 'No Date'}
+                                                        </Badge>
+                                                        <Button variant="link" className="text-danger p-0" onClick={() => handleDeleteActivity(act.id)}>
+                                                            <Trash size={18} />
+                                                        </Button>
+                                                    </div>
+                                                    <h5 className="fw-bold mb-2">{act.title}</h5>
+                                                    <p className="text-muted small mb-0" style={{ whiteSpace: 'pre-wrap' }}>{act.description}</p>
+                                                </Card.Body>
+                                            </Card>
+                                        </Col>
+                                    ))}
+                                </Row>
+                            )}
+                        </div>
+                    </Tab>
                 </Tabs>
             </Container>
 
-            {/* Modals are kept similar but refined with "centered" and "rounded-4" classes */}
+            {/* --- ADD MEMBER MODAL --- */}
+            <Modal show={showForm} onHide={() => setShowForm(false)} centered className="rounded-4">
+                <Modal.Header closeButton className="border-0">
+                    <Modal.Title className="fw-bold">Member Information</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="px-4 pb-4">
+                    <Form onSubmit={handleSubmit}>
+                        <Form.Group className="mb-3">
+                            <Form.Label className="small fw-bold">Full Name</Form.Label>
+                            <Form.Control
+                                required
+                                value={formData.fullName}
+                                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                                placeholder="Enter member name"
+                            />
+                        </Form.Group>
+                        <Row>
+                            <Col md={6}>
+                                <Form.Group className="mb-3">
+                                    <Form.Label className="small fw-bold">Date of Birth</Form.Label>
+                                    <Form.Control
+                                        type="date"
+                                        required
+                                        value={formData.dob}
+                                        onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col md={6}>
+                                <Form.Group className="mb-3">
+                                    <Form.Label className="small fw-bold">Phone Number</Form.Label>
+                                    <Form.Control
+                                        required
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        placeholder="10-digit number"
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        <Form.Group className="mb-4">
+                            <Form.Label className="small fw-bold">House Name</Form.Label>
+                            <Form.Control
+                                required
+                                value={formData.houseName}
+                                onChange={(e) => setFormData({ ...formData, houseName: e.target.value })}
+                                placeholder="E.g. Kizhakkethil House"
+                            />
+                        </Form.Group>
+                        <Button variant="primary" type="submit" className="w-100 action-btn py-2">
+                            Add to Directory
+                        </Button>
+                    </Form>
+                </Modal.Body>
+            </Modal>
+
+            {/* --- ADD EXECUTIVE MODAL --- */}
+            <Modal show={showExecForm} onHide={() => setShowExecForm(false)} centered>
+                <Modal.Header closeButton className="border-0 pb-0">
+                    <Modal.Title className="fw-bold">New Executive</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="p-4">
+                    <Form onSubmit={handleExecSubmit}>
+                        <Form.Group className="mb-3">
+                            <Form.Label className="small fw-bold text-uppercase">Full Name</Form.Label>
+                            <Form.Control
+                                required
+                                value={execFormData.name}
+                                onChange={(e) => setExecFormData({ ...execFormData, name: e.target.value })}
+                                placeholder="E.g. John Doe"
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-4">
+                            <Form.Label className="small fw-bold text-uppercase">Position/Post</Form.Label>
+                            <Form.Control
+                                required
+                                value={execFormData.post}
+                                onChange={(e) => setExecFormData({ ...execFormData, post: e.target.value })}
+                                placeholder="E.g. Secretary"
+                            />
+                        </Form.Group>
+                        <Button variant="primary" type="submit" className="w-100 action-btn py-2">
+                            Save Designation
+                        </Button>
+                    </Form>
+                </Modal.Body>
+            </Modal>
+
+            {/* --- ADD ACTIVITY MODAL --- */}
+            <Modal show={showActivityForm} onHide={() => setShowActivityForm(false)} centered>
+                <Modal.Header closeButton className="border-0 pb-0">
+                    <Modal.Title className="fw-bold">Report Parish Activity</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="p-4">
+                    <Form onSubmit={handleActivitySubmit}>
+                        <Form.Group className="mb-3">
+                            <Form.Label className="small fw-bold text-uppercase">Activity Title</Form.Label>
+                            <Form.Control
+                                required
+                                value={activityFormData.title}
+                                onChange={(e) => setActivityFormData({ ...activityFormData, title: e.target.value })}
+                                placeholder="E.g. Yard Cleaning, Prayer Meet"
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label className="small fw-bold text-uppercase">Date</Form.Label>
+                            <Form.Control
+                                type="date"
+                                required
+                                value={activityFormData.date}
+                                onChange={(e) => setActivityFormData({ ...activityFormData, date: e.target.value })}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-4">
+                            <Form.Label className="small fw-bold text-uppercase">Description / Details</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={3}
+                                required
+                                value={activityFormData.description}
+                                onChange={(e) => setActivityFormData({ ...activityFormData, description: e.target.value })}
+                                placeholder="Tell us more about what happened..."
+                            />
+                        </Form.Group>
+                        <Button variant="primary" type="submit" className="w-100 action-btn py-2">
+                            Post Activity Report
+                        </Button>
+                    </Form>
+                </Modal.Body>
+            </Modal>
         </div>
     );
 }
