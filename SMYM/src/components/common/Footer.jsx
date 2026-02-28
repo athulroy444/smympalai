@@ -51,11 +51,11 @@ function Footer() {
                         <ul className="list-unstyled text-white-50 small">
                             <li className="mb-3 d-flex">
                                 <GeoAlt className="me-2 text-primary mt-1" size={18} />
-                                <span>SMYM Office, Bishop's House,<br />PB No. 18, Palai - 686 575<br />Kottayam, Kerala</span>
+                                <span>SMYM Palai Diocese Office,<br />Shalom Pastoral Centre<br />Palai,Kottayam, Kerala</span>
                             </li>
                             <li className="mb-3 d-flex">
                                 <Telephone className="me-2 text-primary mt-1" size={16} />
-                                <span>+91 4822 212000</span>
+                                <span>+918943456498</span>
                             </li>
                             <li className="mb-3 d-flex">
                                 <Envelope className="me-2 text-primary mt-1" size={16} />

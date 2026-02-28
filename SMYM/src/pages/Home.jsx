@@ -5,7 +5,7 @@ import StatsSection from "../components/home/StatsSection";
 import NewsSection from "../components/home/NewsSection";
 import SecretariatPage from "../components/home/ROOPATHA";
 import SyndicatePage from "../components/home/Syndicate";
-import BrowseForonaSection from "../components/home/BrowseForonaSection";
+
 
 function Home() {
     console.log("Home Page: Rendering...");
@@ -16,7 +16,6 @@ function Home() {
                 <HistorySection />
                 <SecretariatPage />
                 <SyndicatePage />
-                <BrowseForonaSection />
                 <KarmaRekha />
                 <StatsSection />
                 <NewsSection />

@@ -10,7 +10,7 @@ function TopBar() {
                         <Envelope size={14} color="#E14B1F" /> smympalai@gmail.com
                     </span>
                     <span className="d-flex align-items-center gap-2">
-                        <Telephone size={14} color="#E14B1F" /> +91 9876543210
+                        <Telephone size={14} color="#E14B1F" /> +918943456498
                     </span>
                 </div>
                 <div className="d-flex gap-3">

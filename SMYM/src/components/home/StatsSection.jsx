@@ -5,10 +5,10 @@ import { People, Building, Globe, Award } from 'react-bootstrap-icons';
 
 function StatsSection() {
     const stats = [
-        { icon: <People size={40} />, count: "15,000+", label: "Youth Members" },
+        { icon: <People size={40} />, count: "18,000+", label: "Youth Members" },
         { icon: <Building size={40} />, count: "170", label: "Parish Units" },
         { icon: <Globe size={40} />, count: "20", label: "Forane Committees" },
-        { icon: <Award size={40} />, count: "30+", label: "Years of Service" },
+        { icon: <Award size={40} />, count: "50+", label: "Years of Service" },
     ];
 
     return (
