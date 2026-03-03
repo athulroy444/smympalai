@@ -95,13 +95,13 @@ router.get('/events', async (req, res) => {
 
 // POST Event
 router.post('/events', async (req, res) => {
-    const { title, event_date, location } = req.body;
+    const { title, event_date, location, image_url } = req.body;
     try {
         const [result] = await db.execute(
-            'INSERT INTO events (title, event_date, location) VALUES (?, ?, ?)',
-            [title, event_date || null, location || 'TBD']
+            'INSERT INTO events (title, event_date, location, image_url) VALUES (?, ?, ?, ?)',
+            [title, event_date || null, location || 'TBD', image_url || '']
         );
-        res.status(201).json({ id: result.insertId, title, event_date, location });
+        res.status(201).json({ id: result.insertId, title, event_date, location, image_url });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Server Error" });
@@ -110,11 +110,11 @@ router.post('/events', async (req, res) => {
 
 // UPDATE Event
 router.put('/events/:id', async (req, res) => {
-    const { title, event_date, location } = req.body;
+    const { title, event_date, location, image_url } = req.body;
     try {
         await db.execute(
-            'UPDATE events SET title = ?, event_date = ?, location = ? WHERE id = ?',
-            [title, event_date || null, location || 'TBD', req.params.id]
+            'UPDATE events SET title = ?, event_date = ?, location = ?, image_url = ? WHERE id = ?',
+            [title, event_date || null, location || 'TBD', image_url || '', req.params.id]
         );
         res.json({ message: "Event updated successfully" });
     } catch (err) {

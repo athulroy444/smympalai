@@ -5,14 +5,15 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
-import { Calendar, ArrowRight, Plus, Pencil, Trash, GeoAlt } from 'react-bootstrap-icons';
+import Spinner from 'react-bootstrap/Spinner';
+import { Calendar, ArrowRight, Plus, Pencil, Trash, GeoAlt, CloudUpload } from 'react-bootstrap-icons';
 import cardImage from '../../assets/NavLogo.png';
 import { useData } from '../../context/DataContext';
 import { useAuth } from '../../context/AuthContext';
 import { useState } from 'react';
 
 function NewsSection() {
-  const { news, eventsList, addNews, updateNews, deleteNews, addEvent, updateEvent, deleteEvent } = useData();
+  const { news, eventsList, addNews, updateNews, deleteNews, addEvent, updateEvent, deleteEvent, uploadImage, API_BASE } = useData();
   const { user } = useAuth();
   const isAdmin = user && user.role === 'admin';
 
@@ -27,6 +28,8 @@ function NewsSection() {
   const [modalMode, setModalMode] = useState('add');
   const [itemType, setItemType] = useState('news');
   const [currentId, setCurrentId] = useState(null);
+  const [uploading, setUploading] = useState(false);
+
   const [formData, setFormData] = useState({
     title: '',
     event_date: '',
@@ -37,6 +40,12 @@ function NewsSection() {
 
   const truncate = (str, n) => {
     return (str?.length > n) ? str.substr(0, n - 1) + '...' : str;
+  };
+
+  const getImageUrl = (url) => {
+    if (!url) return cardImage;
+    if (url.startsWith('http')) return url;
+    return `${API_BASE}${url}`;
   };
 
   const handleAddNew = () => {
@@ -65,6 +74,20 @@ function NewsSection() {
       image_url: item.image_url || ''
     });
     setShowModal(true);
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    const url = await uploadImage(file);
+    if (url) {
+      setFormData(prev => ({ ...prev, image_url: url }));
+    } else {
+      alert("Upload failed");
+    }
+    setUploading(false);
   };
 
   const handleSubmit = () => {
@@ -115,7 +138,7 @@ function NewsSection() {
 
                   <Card.Img
                     variant="top"
-                    src={item.image_url || cardImage}
+                    src={getImageUrl(item.image_url)}
                     style={{
                       height: '200px',
                       objectFit: item.image_url ? 'cover' : 'contain',
@@ -210,20 +233,47 @@ function NewsSection() {
               )}
 
               <Form.Group className="mb-3">
-                <Form.Label className="small fw-bold">Image URL</Form.Label>
+                <Form.Label className="small fw-bold">Image Cover</Form.Label>
+
+                {formData.image_url && (
+                  <div className="mb-2">
+                    <img src={getImageUrl(formData.image_url)} className="rounded w-100" style={{ height: '120px', objectFit: 'cover' }} alt="Preview" />
+                  </div>
+                )}
+
+                <div className="d-grid mt-2">
+                  <input
+                    type="file"
+                    id="newsImgHome"
+                    hidden
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                  <Button
+                    variant="outline-secondary"
+                    size="sm"
+                    onClick={() => document.getElementById('newsImgHome').click()}
+                    disabled={uploading}
+                  >
+                    {uploading ? <Spinner animation="border" size="sm" /> : <><CloudUpload className="me-2" /> Browse File</>}
+                  </Button>
+                </div>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label className="small fw-bold text-muted">Or Image URL</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="https://..."
                   value={formData.image_url}
                   onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
                 />
-                <Form.Text className="text-muted">Leave empty for default logo</Form.Text>
               </Form.Group>
             </Form>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
-            <Button variant="primary" onClick={handleSubmit}>Save Changes</Button>
+            <Button variant="primary" onClick={handleSubmit} disabled={uploading}>Save Changes</Button>
           </Modal.Footer>
         </Modal>
       </Container>

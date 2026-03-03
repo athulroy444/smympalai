@@ -423,6 +423,20 @@ export const DataProvider = ({ children }) => {
         }
     };
 
+    const uploadImage = async (file) => {
+        try {
+            const formData = new FormData();
+            formData.append('image', file);
+            const res = await axios.post(`${API_BASE}/api/upload`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            return res.data.url; // Returns /uploads/...
+        } catch (err) {
+            console.error("Upload failed", err);
+            return null;
+        }
+    };
+
     const updateSetting = async (key, value) => {
         try {
             await axios.post(`${API_BASE}/api/content/settings`, { key, value });
@@ -498,7 +512,9 @@ export const DataProvider = ({ children }) => {
             addHeroSlide,
             deleteHeroSlide,
             updateSetting,
-            loading
+            loading,
+            uploadImage,
+            API_BASE
         }}>
             {children}
         </DataContext.Provider>

@@ -9,6 +9,7 @@ const dataRoutes = require('./routes/dataRoutes');
 const contentRoutes = require('./routes/contentRoutes');
 const unitRoutes = require('./routes/unitRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ app.use('/api/data', dataRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/unit', unitRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Test Route
 app.get('/', (req, res) => {
