@@ -15,11 +15,11 @@ function Home() {
         return (
             <>
                 <HeroCarousel />
-                <SportsTeaser />
                 <HistorySection />
                 <SecretariatPage />
                 <SyndicatePage />
                 <KarmaRekha />
+                <SportsTeaser />
                 <StatsSection />
                 <NewsSection />
             </>
