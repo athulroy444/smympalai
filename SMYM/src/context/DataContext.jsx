@@ -7,6 +7,7 @@ const DataContext = createContext();
 export const useData = () => useContext(DataContext);
 
 export const DataProvider = ({ children }) => {
+    const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
 
     // --- KARMA REKHA ---
     const [karmaRekha, setKarmaRekha] = useState({
@@ -78,8 +79,6 @@ export const DataProvider = ({ children }) => {
 
     const [foronaList, setForonaList] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
 
     // --- FETCH FROM BACKEND ---
     useEffect(() => {
