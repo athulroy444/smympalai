@@ -154,11 +154,11 @@ router.post('/sports-register', async (req, res) => {
 
 // --- TEAM REGISTRATION ---
 router.post('/team-register', async (req, res) => {
-    const { teamName, captainName, captainPhone, foronaName, unitName, eventName, playerCount, playersList, amount } = req.body;
+    const { teamName, managerName, managerPhone, foronaName, unitName, eventName, playerCount, playersList, amount } = req.body;
     try {
         const [result] = await db.execute(
             'INSERT INTO team_registrations (team_name, captain_name, captain_phone, forona_name, unit_name, event_name, player_count, players_list, amount, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [teamName, captainName, captainPhone, foronaName, unitName, eventName, playerCount, JSON.stringify(playersList), amount, 'paid']
+            [teamName, managerName, managerPhone, foronaName, unitName, eventName, playerCount, JSON.stringify(playersList), amount, 'paid']
         );
         res.status(201).json({ id: result.insertId, message: "Team Registration & Payment Successful" });
     } catch (err) {

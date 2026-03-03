@@ -17,8 +17,8 @@ const SportsRegistration = () => {
     // Form State
     const [formData, setFormData] = useState({
         teamName: '',
-        captainName: '',
-        captainPhone: '',
+        managerName: '',
+        managerPhone: '',
         foronaName: '',
         unitName: '',
         eventName: 'Eparchial Cricket League 2025',
@@ -94,10 +94,10 @@ const SportsRegistration = () => {
     };
 
     const handleNext = () => {
-        if (formData.teamName && formData.captainName && formData.foronaName && formData.unitName && formData.playersList.every(p => p.trim() !== '')) {
+        if (formData.teamName && formData.managerName && formData.managerPhone && formData.foronaName && formData.unitName && formData.playersList.every(p => p.trim() !== '')) {
             setStep(2);
         } else {
-            alert("Please fill all required team and parish details.");
+            alert("Please fill all required team and manager details.");
         }
     };
 
@@ -228,7 +228,7 @@ const SportsRegistration = () => {
                                                 <Form.Label className="small fw-bold text-muted text-uppercase">Select Sporting Event</Form.Label>
                                                 <Form.Select name="eventName" value={formData.eventName} onChange={handleInputChange} className="input-premium text-danger fw-bold">
                                                     {events.map((ev, i) => (
-                                                        <option key={i} value={ev.name}>{ev.name} (₹{ev.fee})</option>
+                                                        <option key={i} value={ev.name}>{ev.name}</option>
                                                     ))}
                                                 </Form.Select>
                                             </Col>
@@ -238,8 +238,12 @@ const SportsRegistration = () => {
                                                 <Form.Control name="teamName" placeholder="Enter Team Name" value={formData.teamName} onChange={handleInputChange} className="input-premium" />
                                             </Col>
                                             <Col md={6}>
-                                                <Form.Label className="small fw-bold text-muted text-uppercase">Captain Name</Form.Label>
-                                                <Form.Control name="captainName" placeholder="Captain Full Name" value={formData.captainName} onChange={handleInputChange} className="input-premium" />
+                                                <Form.Label className="small fw-bold text-muted text-uppercase">Team Manager Name</Form.Label>
+                                                <Form.Control name="managerName" placeholder="Manager Full Name" value={formData.managerName} onChange={handleInputChange} className="input-premium" />
+                                            </Col>
+                                            <Col md={6}>
+                                                <Form.Label className="small fw-bold text-muted text-uppercase">Manager Phone Number</Form.Label>
+                                                <Form.Control name="managerPhone" placeholder="Mobile Number" value={formData.managerPhone} onChange={handleInputChange} className="input-premium" />
                                             </Col>
 
                                             <Col md={6}>
