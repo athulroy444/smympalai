@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import PageHeader from '../components/common/PageHeader';
 import { Person, Calendar, Telephones, Geo, CreditCard, ShieldCheck, CheckCircleFill, Trophy } from 'react-bootstrap-icons';
-import sportsBanner from '../assets/sports_event_banner_1772538309321.png';
+import sportsBanner from '../assets/sports_event_banner.png';
 
 const SportsRegistration = () => {
     const { foronaList, registerSportsEvent } = useData();
