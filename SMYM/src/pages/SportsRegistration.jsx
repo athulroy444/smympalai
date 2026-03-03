@@ -3,7 +3,7 @@ import { Container, Row, Col, Card, Form, Button, Tabs, Tab, Alert } from 'react
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import PageHeader from '../components/common/PageHeader';
-import { Person, Calendar, Telephones, Geo, CreditCard, ShieldCheck, CheckCircleFill, Trophy } from 'react-bootstrap-icons';
+import { Person, Calendar, CreditCard, ShieldCheck, CheckCircleFill, Trophy, Telephone, GeoAlt } from 'react-bootstrap-icons';
 import sportsBanner from '../assets/sports_event_banner.png';
 
 const SportsRegistration = () => {
@@ -59,7 +59,7 @@ const SportsRegistration = () => {
     };
 
     // Flatten units for selection
-    const allUnits = foronaList.flatMap(f => f.units.map(u => u.name)).sort();
+    const allUnits = foronaList?.flatMap(f => f.units?.map(u => u.name) || [])?.sort() || [];
 
     return (
         <div className="sports-reg-page pb-5" style={{ backgroundColor: '#f4f7fe', minHeight: '100vh' }}>
