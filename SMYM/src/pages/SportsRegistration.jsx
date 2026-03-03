@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert, Badge } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../context/DataContext';
+import { useAuth } from '../context/AuthContext';
 import PageHeader from '../components/common/PageHeader';
 import { Person, CreditCard, ShieldCheck, CheckCircleFill, Trophy, Plus, Dash, PeopleFill, GeoAltFill } from 'react-bootstrap-icons';
 import sportsBanner from '../assets/sports_event_banner.png';
 
 const SportsRegistration = () => {
     const { foronaList, registerTeamEvent } = useData();
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -24,6 +26,25 @@ const SportsRegistration = () => {
         playerCount: 1,
         playersList: ['']
     });
+
+    // Auto-fill if unit is logged in
+    useEffect(() => {
+        if (user && user.role === 'unit' && foronaList && foronaList.length > 0) {
+            const unitName = user.username;
+            // Case-insensitive search
+            const parentForona = foronaList.find(f =>
+                f.units && f.units.some(u => u.name.toLowerCase() === unitName.toLowerCase())
+            );
+
+            if (parentForona) {
+                setFormData(prev => ({
+                    ...prev,
+                    foronaName: parentForona.name,
+                    unitName: unitName
+                }));
+            }
+        }
+    }, [user, foronaList]);
 
     const events = [
         { name: "Eparchial Cricket League 2025", fee: 1500, type: 'group' },
@@ -223,7 +244,7 @@ const SportsRegistration = () => {
 
                                             <Col md={6}>
                                                 <Form.Label className="small fw-bold text-muted text-uppercase">Select Forona</Form.Label>
-                                                <Form.Select name="foronaName" value={formData.foronaName} onChange={handleInputChange} className="input-premium">
+                                                <Form.Select name="foronaName" value={formData.foronaName} onChange={handleInputChange} className="input-premium" disabled={user?.role === 'unit'}>
                                                     <option value="">-- Choose Forona --</option>
                                                     {foronaList.map((f, i) => (
                                                         <option key={i} value={f.name}>{f.name}</option>
@@ -232,7 +253,7 @@ const SportsRegistration = () => {
                                             </Col>
                                             <Col md={6}>
                                                 <Form.Label className="small fw-bold text-muted text-uppercase">Select Unit</Form.Label>
-                                                <Form.Select name="unitName" value={formData.unitName} onChange={handleInputChange} className="input-premium" disabled={!formData.foronaName}>
+                                                <Form.Select name="unitName" value={formData.unitName} onChange={handleInputChange} className="input-premium" disabled={!formData.foronaName || user?.role === 'unit'}>
                                                     <option value="">-- Choose Unit --</option>
                                                     {availableUnits.map((u, i) => (
                                                         <option key={i} value={u.name}>{u.name}</option>
