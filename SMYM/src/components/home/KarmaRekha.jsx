@@ -60,6 +60,7 @@ function KarmaRekha() {
                                 size="lg"
                                 href={karmaRekha?.link || '#'}
                                 target="_blank"
+                                download="Darshanam.pdf"
                                 className="fw-bold px-4 py-3 rounded-pill shadow"
                             >
                                 <Download className="me-2" /> Download PDF

@@ -1,5 +1,6 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import axios from 'axios';
+import darshanamPdf from '../assets/Darshanam.pdf';
 
 const DataContext = createContext();
 
@@ -9,8 +10,8 @@ export const DataProvider = ({ children }) => {
 
     // --- KARMA REKHA ---
     const [karmaRekha, setKarmaRekha] = useState({
-        title: "Karma Rekha 2025",
-        link: "#"
+        title: "Karma Rekha 2025 (Darshanam)",
+        link: darshanamPdf
     });
 
     const updateKarmaRekha = (data) => {
