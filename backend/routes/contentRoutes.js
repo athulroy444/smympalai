@@ -54,6 +54,21 @@ router.post('/news', async (req, res) => {
     }
 });
 
+// UPDATE News
+router.put('/news/:id', async (req, res) => {
+    const { title, event_date, description, image_url } = req.body;
+    try {
+        await db.execute(
+            'UPDATE news SET title = ?, event_date = ?, description = ?, image_url = ? WHERE id = ?',
+            [title, event_date || null, description || '', image_url || '', req.params.id]
+        );
+        res.json({ message: "News updated successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
 // DELETE News
 router.delete('/news/:id', async (req, res) => {
     try {
@@ -87,6 +102,21 @@ router.post('/events', async (req, res) => {
             [title, event_date || null, location || 'TBD']
         );
         res.status(201).json({ id: result.insertId, title, event_date, location });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
+// UPDATE Event
+router.put('/events/:id', async (req, res) => {
+    const { title, event_date, location } = req.body;
+    try {
+        await db.execute(
+            'UPDATE events SET title = ?, event_date = ?, location = ? WHERE id = ?',
+            [title, event_date || null, location || 'TBD', req.params.id]
+        );
+        res.json({ message: "Event updated successfully" });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Server Error" });

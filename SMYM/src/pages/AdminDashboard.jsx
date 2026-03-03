@@ -53,6 +53,13 @@ function AdminDashboard() {
             color: '#fd7e14'
         },
         {
+            title: 'News & Updates',
+            description: 'Post general updates, event news and announcements to the home page.',
+            icon: <GraphUp size={30} />,
+            link: '/admin/news',
+            color: '#dc3545'
+        },
+        {
             title: 'User Settings',
             description: 'Manage admin accounts, permissions and system configurations.',
             icon: <Gear size={30} />,

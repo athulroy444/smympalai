@@ -59,20 +59,24 @@ function NewsSection() {
   // Note: Edit currently implemented fully only for News in DataContext, 
   // but we can add Edit for events later. For now, we allow Adding both.
   const handleEdit = (item) => {
-    // Basic edit support
-    if (item.type === 'event') {
-      alert("Editing events is coming soon. You can delete and re-add for now.");
-      return;
-    }
     setModalMode('edit');
-    setItemType('news');
+    setItemType(item.type);
     setCurrentId(item.id);
-    setFormData({
-      title: item.title,
-      event_date: item.event_date,
-      description: item.description,
-      location: ''
-    });
+    if (item.type === 'news') {
+      setFormData({
+        title: item.title,
+        event_date: item.event_date ? item.event_date.split('T')[0] : '',
+        description: item.description,
+        location: ''
+      });
+    } else {
+      setFormData({
+        title: item.title,
+        event_date: item.event_date ? item.event_date.split('T')[0] : '',
+        description: '',
+        location: item.location
+      });
+    }
     setShowModal(true);
   };
 
@@ -88,8 +92,15 @@ function NewsSection() {
         });
       }
     } else {
-      if (itemType === 'news') updateNews(currentId, formData);
-      // Event update not yet wired
+      if (itemType === 'news') {
+        updateNews(currentId, formData);
+      } else {
+        updateEvent(currentId, {
+          title: formData.title,
+          event_date: formData.event_date,
+          location: formData.location
+        });
+      }
     }
     setShowModal(false);
   };

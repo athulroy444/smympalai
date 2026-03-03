@@ -20,6 +20,7 @@ import ForonaExecutives from "./pages/ForonaExecutives";
 import AdminDashboard from "./pages/AdminDashboard";
 import MemberDirectory from "./pages/MemberDirectory";
 import SportsRegistration from "./pages/SportsRegistration";
+import AdminNews from "./pages/AdminNews";
 
 import { AuthProvider } from "./context/AuthContext";
 import { DataProvider } from "./context/DataContext";
@@ -53,6 +54,7 @@ function App() {
               <Route path="/forona-executives" element={<ForonaExecutives />} />
               <Route path="/admin-dashboard" element={<AdminDashboard />} />
               <Route path="/admin/member-directory" element={<MemberDirectory />} />
+              <Route path="/admin/news" element={<AdminNews />} />
             </Routes>
           </main>
 

@@ -140,12 +140,13 @@ export const DataProvider = ({ children }) => {
     };
 
     const updateNews = async (id, updatedData) => {
-        // Optimistic update for demo
-        setNews(prev => prev.map(item => item.id === id ? { ...item, ...updatedData } : item));
         try {
-            // In a real app: await axios.put(`${API_BASE}/api/content/news/${id}`, updatedData);
+            await axios.put(`${API_BASE}/api/content/news/${id}`, updatedData);
+            setNews(prev => prev.map(item => item.id === id ? { ...item, ...updatedData } : item));
+            return true;
         } catch (err) {
             console.error("Failed to update news", err);
+            return false;
         }
     };
 
@@ -165,6 +166,17 @@ export const DataProvider = ({ children }) => {
             return true;
         } catch (err) {
             console.error("Failed to add event", err);
+            return false;
+        }
+    };
+
+    const updateEvent = async (id, updatedData) => {
+        try {
+            await axios.put(`${API_BASE}/api/content/events/${id}`, updatedData);
+            setEventsList(prev => prev.map(item => item.id === id ? { ...item, ...updatedData } : item));
+            return true;
+        } catch (err) {
+            console.error("Failed to update event", err);
             return false;
         }
     };
@@ -471,6 +483,7 @@ export const DataProvider = ({ children }) => {
             deleteRoopathaExecutive, // New
             updateNews, // New
             deleteNews, // New
+            updateEvent, // New
             eventsList, // New
             addEvent, // New
             deleteEvent, // New
