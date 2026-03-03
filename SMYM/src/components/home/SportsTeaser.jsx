@@ -15,8 +15,8 @@ const SportsTeaser = () => {
                             <Trophy size={40} className="text-warning" />
                         </div>
                         <div>
-                            <h2 className="fw-black text-white mb-1">Eparchial Sports Meet 2025</h2>
-                            <p className="text-white-50 mb-0">Registrations are now open for all units. Showcase your athletic prowess!</p>
+                            <h2 className="fw-black text-white mb-1">Eparchial Team Championships 2025</h2>
+                            <p className="text-white-50 mb-0">Cricket, Football, Volleyball & more. Register your unit team today!</p>
                         </div>
                     </div>
                     <Button

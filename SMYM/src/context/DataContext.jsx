@@ -422,12 +422,12 @@ export const DataProvider = ({ children }) => {
         }
     };
 
-    const registerSportsEvent = async (regData) => {
+    const registerTeamEvent = async (regData) => {
         try {
-            const res = await axios.post(`${API_BASE}/api/unit/sports-register`, regData);
+            const res = await axios.post(`${API_BASE}/api/unit/team-register`, regData);
             return res.data;
         } catch (err) {
-            console.error("Sports registration failed", err);
+            console.error("Team registration failed", err);
             return null;
         }
     };
@@ -452,6 +452,7 @@ export const DataProvider = ({ children }) => {
             fetchEvents, // New
             registerForEvent, // New
             registerSportsEvent, // New
+            registerTeamEvent, // New
 
             fetchRegistrations, // New
             roopathaExecutives, // New
