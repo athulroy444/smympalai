@@ -3,7 +3,7 @@ import { Container, Row, Col, Card, Form, Button, Tabs, Tab, Alert } from 'react
 import { useNavigate } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import PageHeader from '../components/common/PageHeader';
-import { Person, Calendar, CreditCard, ShieldCheck, CheckCircleFill, Trophy, Telephone, GeoAlt } from 'react-bootstrap-icons';
+import { Person, CreditCard, ShieldCheck, CheckCircleFill, Trophy } from 'react-bootstrap-icons';
 import sportsBanner from '../assets/sports_event_banner.png';
 
 const SportsRegistration = () => {
