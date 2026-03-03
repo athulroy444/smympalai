@@ -15,8 +15,7 @@ function Home() {
         return (
             <>
                 <HeroCarousel />
-                {/* <BrowseForonaSection /> */}
-                {/* <SportsTeaser /> */}
+                <SportsTeaser />
                 <HistorySection />
                 <SecretariatPage />
                 <SyndicatePage />
