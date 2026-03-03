@@ -2,9 +2,20 @@ import React from 'react';
 import { Container, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, ArrowRight } from 'react-bootstrap-icons';
+import { useAuth } from '../../context/AuthContext';
 
 const SportsTeaser = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
+
+    const handleRegisterClick = () => {
+        if (user) {
+            navigate('/sports-registration');
+        } else {
+            // Redirect to login if not unit/user is not logged in
+            navigate('/login');
+        }
+    };
 
     return (
         <section className="sports-teaser-section py-5">
@@ -23,7 +34,7 @@ const SportsTeaser = () => {
                         variant="warning"
                         size="lg"
                         className="rounded-pill px-5 py-3 fw-bold d-flex align-items-center shadow-lg hover-scale"
-                        onClick={() => navigate('/sports-registration')}
+                        onClick={handleRegisterClick}
                     >
                         Register Now <ArrowRight className="ms-3" />
                     </Button>

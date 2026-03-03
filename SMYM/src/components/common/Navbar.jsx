@@ -95,7 +95,11 @@ function AppNavbar() {
                 <NavDropdown.Item as={Link} to="/activities">Camps</NavDropdown.Item>
                 <NavDropdown.Item as={Link} to="/activities">Social Service</NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item as={Link} to="/sports-registration" className="text-primary fw-bold">
+                <NavDropdown.Item
+                  onClick={() => user ? navigate('/sports-registration') : navigate('/login')}
+                  className="text-primary fw-bold"
+                  style={{ cursor: 'pointer' }}
+                >
                   Sports Registration
                 </NavDropdown.Item>
               </NavDropdown>
