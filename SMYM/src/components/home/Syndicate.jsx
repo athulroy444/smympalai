@@ -42,7 +42,7 @@ const Roopatha = () => {
         { name: "ZACHARIAS JAMES", role: "Pravithanam", image: syndicate12, zoom: 1.2, pos: 'center 20%' },
         { name: "IVAN MATHEW", role: "Ramapuram", image: syndicate13, zoom: 1.1, pos: 'center 15%' },
         { name: "ALAN GEORGE", role: "Teekoy", image: syndicate14, zoom: 1.9, pos: 'center 55%' },
-        { name: "ALEENA ROBIN", role: "Thudanganadu", image: syndicate15, zoom: 1.5, pos: 'center 55%' },
+        { name: "ALEENA ROBINS", role: "Thudanganadu", image: syndicate15, zoom: 1.5, pos: 'center 55%' },
     ];
 
     return (

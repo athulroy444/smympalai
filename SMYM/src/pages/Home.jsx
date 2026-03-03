@@ -1,4 +1,5 @@
 import HeroCarousel from "../components/home/HeroCarousel";
+import BrowseForonaSection from "../components/home/BrowseForonaSection";
 import KarmaRekha from "../components/home/KarmaRekha";
 import HistorySection from "../components/home/HistorySection";
 import StatsSection from "../components/home/StatsSection";
@@ -13,6 +14,7 @@ function Home() {
         return (
             <>
                 <HeroCarousel />
+                <BrowseForonaSection />
                 <HistorySection />
                 <SecretariatPage />
                 <SyndicatePage />
