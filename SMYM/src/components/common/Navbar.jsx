@@ -94,6 +94,10 @@ function AppNavbar() {
                 <NavDropdown.Item as={Link} to="/activities">Events</NavDropdown.Item>
                 <NavDropdown.Item as={Link} to="/activities">Camps</NavDropdown.Item>
                 <NavDropdown.Item as={Link} to="/activities">Social Service</NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item as={Link} to="/sports-registration" className="text-primary fw-bold">
+                  Sports Registration
+                </NavDropdown.Item>
               </NavDropdown>
 
               <NavDropdown title="Forana" id="forona-dropdown">

@@ -137,4 +137,19 @@ router.delete('/activities/:id', async (req, res) => {
     }
 });
 
+// --- SPORTS REGISTRATION ---
+router.post('/sports-register', async (req, res) => {
+    const { fullName, dob, phone, unitName, eventName, amount } = req.body;
+    try {
+        const [result] = await db.execute(
+            'INSERT INTO sports_registrations (full_name, dob, phone, unit_name, event_name, amount, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [fullName, dob, phone, unitName, eventName, amount, 'paid'] // Simulating auto-paid for now
+        );
+        res.status(201).json({ id: result.insertId, message: "Registration & Payment Successful" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
 module.exports = router;

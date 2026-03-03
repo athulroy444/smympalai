@@ -6,6 +6,7 @@ import StatsSection from "../components/home/StatsSection";
 import NewsSection from "../components/home/NewsSection";
 import SecretariatPage from "../components/home/ROOPATHA";
 import SyndicatePage from "../components/home/Syndicate";
+import SportsTeaser from "../components/home/SportsTeaser";
 
 
 function Home() {
@@ -15,6 +16,7 @@ function Home() {
             <>
                 <HeroCarousel />
                 {/* <BrowseForonaSection /> */}
+                <SportsTeaser />
                 <HistorySection />
                 <SecretariatPage />
                 <SyndicatePage />

@@ -19,6 +19,7 @@ import Profile from "./pages/Profile";
 import ForonaExecutives from "./pages/ForonaExecutives";
 import AdminDashboard from "./pages/AdminDashboard";
 import MemberDirectory from "./pages/MemberDirectory";
+import SportsRegistration from "./pages/SportsRegistration";
 
 import { AuthProvider } from "./context/AuthContext";
 import { DataProvider } from "./context/DataContext";
@@ -41,6 +42,7 @@ function App() {
               <Route path="/activities" element={<Activities />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/forona" element={<Forona />} />
+              <Route path="/sports-registration" element={<SportsRegistration />} />
 
               {/* Auth */}
               <Route path="/login" element={<Login />} />

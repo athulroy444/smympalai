@@ -423,6 +423,16 @@ export const DataProvider = ({ children }) => {
         }
     };
 
+    const registerSportsEvent = async (regData) => {
+        try {
+            const res = await axios.post(`${API_BASE}/api/unit/sports-register`, regData);
+            return res.data;
+        } catch (err) {
+            console.error("Sports registration failed", err);
+            return null;
+        }
+    };
+
     return (
         <DataContext.Provider value={{
             foronaList,
@@ -442,6 +452,7 @@ export const DataProvider = ({ children }) => {
             deleteUnitActivity,
             fetchEvents, // New
             registerForEvent, // New
+            registerSportsEvent, // New
 
             fetchRegistrations, // New
             roopathaExecutives, // New
