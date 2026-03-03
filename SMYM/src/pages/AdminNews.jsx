@@ -17,7 +17,8 @@ function AdminNews() {
         title: '',
         event_date: '',
         description: '',
-        location: ''
+        location: '',
+        image_url: ''
     });
 
     const combinedList = [
@@ -28,7 +29,7 @@ function AdminNews() {
     const handleAdd = (type) => {
         setModalMode('add');
         setItemType(type);
-        setFormData({ title: '', event_date: '', description: '', location: '' });
+        setFormData({ title: '', event_date: '', description: '', location: '', image_url: '' });
         setShowModal(true);
     };
 
@@ -40,7 +41,8 @@ function AdminNews() {
             title: item.title,
             event_date: item.event_date ? item.event_date.split('T')[0] : '',
             description: item.description || '',
-            location: item.location || ''
+            location: item.location || '',
+            image_url: item.image_url || ''
         });
         setShowModal(true);
     };
@@ -193,6 +195,18 @@ function AdminNews() {
                                 />
                             </Form.Group>
                         )}
+
+                        <Form.Group className="mb-3">
+                            <Form.Label className="small fw-bold text-muted text-uppercase">Image URL</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Paste image link (e.g. https://...)"
+                                value={formData.image_url}
+                                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                                className="rounded-3"
+                            />
+                            <Form.Text className="text-muted small">Leave blank to use default logo.</Form.Text>
+                        </Form.Group>
                     </Modal.Body>
                     <Modal.Footer className="border-0 px-4 pb-4">
                         <Button variant="light" onClick={() => setShowModal(false)} className="rounded-pill px-4">Cancel</Button>

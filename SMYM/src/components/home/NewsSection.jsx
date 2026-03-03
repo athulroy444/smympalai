@@ -12,40 +12,37 @@ import { useAuth } from '../../context/AuthContext';
 import { useState } from 'react';
 
 function NewsSection() {
-  const { news, eventsList, addNews, updateNews, deleteNews, addEvent, deleteEvent } = useData();
+  const { news, eventsList, addNews, updateNews, deleteNews, addEvent, updateEvent, deleteEvent } = useData();
   const { user } = useAuth();
   const isAdmin = user && user.role === 'admin';
 
   // --- MERGE LISTS ---
-  // We want to show both News and Events in the same list
   const combinedList = [
     ...news.map(n => ({ ...n, type: 'news' })),
     ...eventsList.map(e => ({ ...e, type: 'event' }))
-  ].sort((a, b) => new Date(b.event_date || 0) - new Date(a.event_date || 0)); // Sort by date desc
+  ].sort((a, b) => new Date(b.event_date || 0) - new Date(a.event_date || 0));
 
-  // --- STATE FOR EDITING/ADDING ---
+  // --- STATE ---
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState('add'); // 'add' or 'edit' (edit only for news demo)
-  const [itemType, setItemType] = useState('news'); // 'news' or 'event'
-
+  const [modalMode, setModalMode] = useState('add');
+  const [itemType, setItemType] = useState('news');
   const [currentId, setCurrentId] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     event_date: '',
     description: '',
-    location: ''
+    location: '',
+    image_url: ''
   });
 
-  // Limit content for display
   const truncate = (str, n) => {
     return (str?.length > n) ? str.substr(0, n - 1) + '...' : str;
   };
 
-  // HANDLERS
   const handleAddNew = () => {
     setModalMode('add');
     setItemType('news');
-    setFormData({ title: '', event_date: '', description: '', location: '' });
+    setFormData({ title: '', event_date: '', description: '', location: '', image_url: '' });
     setShowModal(true);
   };
 
@@ -56,51 +53,27 @@ function NewsSection() {
     }
   };
 
-  // Note: Edit currently implemented fully only for News in DataContext, 
-  // but we can add Edit for events later. For now, we allow Adding both.
   const handleEdit = (item) => {
     setModalMode('edit');
     setItemType(item.type);
     setCurrentId(item.id);
-    if (item.type === 'news') {
-      setFormData({
-        title: item.title,
-        event_date: item.event_date ? item.event_date.split('T')[0] : '',
-        description: item.description,
-        location: ''
-      });
-    } else {
-      setFormData({
-        title: item.title,
-        event_date: item.event_date ? item.event_date.split('T')[0] : '',
-        description: '',
-        location: item.location
-      });
-    }
+    setFormData({
+      title: item.title || '',
+      event_date: item.event_date ? item.event_date.split('T')[0] : '',
+      description: item.description || '',
+      location: item.location || '',
+      image_url: item.image_url || ''
+    });
     setShowModal(true);
   };
 
   const handleSubmit = () => {
     if (modalMode === 'add') {
-      if (itemType === 'news') {
-        addNews(formData);
-      } else {
-        addEvent({
-          title: formData.title,
-          event_date: formData.event_date,
-          location: formData.location
-        });
-      }
+      if (itemType === 'news') addNews(formData);
+      else addEvent(formData);
     } else {
-      if (itemType === 'news') {
-        updateNews(currentId, formData);
-      } else {
-        updateEvent(currentId, {
-          title: formData.title,
-          event_date: formData.event_date,
-          location: formData.location
-        });
-      }
+      if (itemType === 'news') updateNews(currentId, formData);
+      else updateEvent(currentId, formData);
     }
     setShowModal(false);
   };
@@ -124,19 +97,16 @@ function NewsSection() {
 
         <Row>
           {combinedList.length === 0 ? (
-            <div className="text-center">No news or events found.</div>
+            <div className="text-center w-100 py-5">No news or events found.</div>
           ) : (
-            combinedList.slice(0, 4).map((item, idx) => (
+            combinedList.slice(0, 4).map((item) => (
               <Col key={`${item.type}-${item.id}`} lg={3} md={6} className="mb-4">
-                <Card className="h-100 shadow-sm border-0 h-100-hover-effect position-relative">
-
+                <Card className="h-100 shadow-sm border-0 position-relative">
                   {isAdmin && (
                     <div className="position-absolute top-0 end-0 p-2 z-1">
-                      {item.type === 'news' && (
-                        <Button variant="light" size="sm" className="me-1 shadow-sm text-primary" onClick={() => handleEdit(item)}>
-                          <Pencil size={12} />
-                        </Button>
-                      )}
+                      <Button variant="light" size="sm" className="me-1 shadow-sm text-primary" onClick={() => handleEdit(item)}>
+                        <Pencil size={12} />
+                      </Button>
                       <Button variant="light" size="sm" className="shadow-sm text-danger" onClick={() => handleDelete(item.id, item.type)}>
                         <Trash size={12} />
                       </Button>
@@ -145,65 +115,70 @@ function NewsSection() {
 
                   <Card.Img
                     variant="top"
-                    src={cardImage}
-                    style={{ height: '200px', objectFit: 'contain', padding: '20px', backgroundColor: '#f9f9f9' }}
+                    src={item.image_url || cardImage}
+                    style={{
+                      height: '200px',
+                      objectFit: item.image_url ? 'cover' : 'contain',
+                      padding: item.image_url ? '0' : '20px',
+                      backgroundColor: '#f9f9f9'
+                    }}
                   />
                   <Card.Body className="d-flex flex-column">
                     <div className="d-flex align-items-center mb-2 text-muted small">
                       <Calendar size={14} className="me-2 text-primary" />
                       {item.event_date ? new Date(item.event_date).toLocaleDateString() : 'Date TBD'}
-                      {item.type === 'event' && <span className='ms-auto badge bg-warning text-dark'>Event</span>}
-                      {item.type === 'news' && <span className='ms-auto badge bg-info'>News</span>}
+                      <span className={`ms-auto badge ${item.type === 'news' ? 'bg-info' : 'bg-warning text-dark'}`}>
+                        {item.type === 'news' ? 'News' : 'Event'}
+                      </span>
                     </div>
-
                     <Card.Title className="fw-bold mb-3 fs-6">{item.title}</Card.Title>
-
                     <Card.Text className="text-secondary small mb-4 flex-grow-1">
                       {item.type === 'news' ? truncate(item.description, 100) : (
                         <span><GeoAlt className="me-1" /> {item.location}</span>
                       )}
                     </Card.Text>
-
-                    <a href="#" className="text-primary fw-bold text-decoration-none small d-flex align-items-center">
+                    <a href="#" className="text-primary fw-bold text-decoration-none small d-flex align-items-center mt-auto">
                       Read More <ArrowRight className="ms-1" />
                     </a>
                   </Card.Body>
                 </Card>
               </Col>
-            )))}
+            ))
+          )}
         </Row>
 
         <div className="text-center mt-4">
-          <Button variant="outline-primary" className="rounded-0">View All Updates</Button>
+          <Button variant="outline-primary">View All Updates</Button>
         </div>
 
-        {/* ADMIN MODAL */}
-        <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal show={showModal} onHide={() => setShowModal(false)} centered>
           <Modal.Header closeButton>
-            <Modal.Title>{modalMode === 'add' ? 'Add Item' : 'Edit News'}</Modal.Title>
+            <Modal.Title className="fw-bold">{modalMode === 'add' ? 'Add Update' : 'Edit Update'}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form>
               {modalMode === 'add' && (
                 <Form.Group className="mb-3">
-                  <Form.Label>Type</Form.Label>
+                  <Form.Label className="small fw-bold">Type</Form.Label>
                   <Form.Select value={itemType} onChange={(e) => setItemType(e.target.value)}>
-                    <option value="news">News (General Update)</option>
-                    <option value="event">Event (For Registration)</option>
+                    <option value="news">News Update</option>
+                    <option value="event">Upcoming Event</option>
                   </Form.Select>
                 </Form.Group>
               )}
 
               <Form.Group className="mb-3">
-                <Form.Label>Title</Form.Label>
+                <Form.Label className="small fw-bold">Title</Form.Label>
                 <Form.Control
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  placeholder="Enter title"
                 />
               </Form.Group>
+
               <Form.Group className="mb-3">
-                <Form.Label>Date</Form.Label>
+                <Form.Label className="small fw-bold">Date</Form.Label>
                 <Form.Control
                   type="date"
                   value={formData.event_date}
@@ -213,7 +188,7 @@ function NewsSection() {
 
               {itemType === 'news' && (
                 <Form.Group className="mb-3">
-                  <Form.Label>Description</Form.Label>
+                  <Form.Label className="small fw-bold">Description</Form.Label>
                   <Form.Control
                     as="textarea" rows={3}
                     value={formData.description}
@@ -224,18 +199,30 @@ function NewsSection() {
 
               {itemType === 'event' && (
                 <Form.Group className="mb-3">
-                  <Form.Label>Location</Form.Label>
+                  <Form.Label className="small fw-bold">Location</Form.Label>
                   <Form.Control
                     type="text"
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    placeholder="Event location"
                   />
                 </Form.Group>
               )}
+
+              <Form.Group className="mb-3">
+                <Form.Label className="small fw-bold">Image URL</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="https://..."
+                  value={formData.image_url}
+                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                />
+                <Form.Text className="text-muted">Leave empty for default logo</Form.Text>
+              </Form.Group>
             </Form>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowModal(false)}>Close</Button>
+            <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
             <Button variant="primary" onClick={handleSubmit}>Save Changes</Button>
           </Modal.Footer>
         </Modal>
