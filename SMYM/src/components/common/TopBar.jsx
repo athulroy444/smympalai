@@ -3,7 +3,7 @@ import { Envelope, Telephone, Facebook, Youtube, Instagram } from 'react-bootstr
 
 function TopBar() {
     return (
-        <div className="py-2 text-white" style={{ backgroundColor: '#111', fontSize: '0.9rem' }}>
+        <div className="py-2 text-white" style={{ backgroundColor: '#111', fontSize: '0.9rem', position: 'relative', zIndex: 10001 }}>
             <Container className="d-flex justify-content-between align-items-center">
                 <div className="d-flex gap-3">
                     <span className="d-flex align-items-center gap-2">

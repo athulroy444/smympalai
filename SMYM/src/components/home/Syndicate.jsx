@@ -104,69 +104,73 @@ const customStyles = `
         display: grid;
         grid-template-columns: repeat(12, 1fr); 
         gap: 30px;
-        max-width: 1200px;
+        max-width: 1300px;
         margin: 0 auto;
     }
 
     .member-card {
         position: relative;
-        border-radius: 20px;
+        border-radius: 24px;
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
-        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         overflow: hidden;
-        border: 1px solid #f0f0f0;
-        background: #ffffff;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        padding: 20px;
     }
 
     .box-badge {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
-        background: #E14B1F;
+        background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
         color: #fff;
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         font-weight: 800;
-        padding: 8px 0;
+        padding: 6px 0;
         text-transform: uppercase;
         letter-spacing: 2px;
-        margin-bottom: 20px;
     }
 
     .top-tier {
         grid-column: span 4;
-        background: #fffcfb;
-        border: 1px solid #ffe8e0;
-        padding-bottom: 25px; 
+        background: #ffffff;
+        border: 1px solid rgba(225, 75, 31, 0.1);
+        padding-top: 40px;
     }
 
     .sub-tier {
         grid-column: span 3;
-        padding: 24px 16px;
-        margin-top: 30px;
+        margin-top: 10px;
     }
 
     .img-wrapper {
-        width: 100px;
-        height: 100px;
+        width: 110px;
+        height: 110px;
         border-radius: 50%;
         overflow: hidden;
-        margin-bottom: 15px;
-        border: 3px solid #f8f9fa;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        border: 4px solid #fff;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     }
 
     .top-tier .img-wrapper {
-        width: 120px;
-        height: 120px;
-        border-color: #ffe8e0;
+        width: 130px;
+        height: 130px;
+        border-color: rgba(225, 75, 31, 0.1);
     }
 
     .profile-img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        transition: transform 0.5s ease;
     }
 
     .role-tag {
@@ -176,21 +180,27 @@ const customStyles = `
         text-transform: uppercase;
         display: block;
         margin-bottom: 8px;
-        color: #E14B1F !important;
+        color: var(--primary) !important;
     }
 
     .member-name {
         font-size: 1rem;
-        color: #1e293b;
+        font-family: 'Outfit', sans-serif;
+        color: var(--text-main);
         margin: 0;
         line-height: 1.3;
         font-weight: 800;
+        text-transform: uppercase;
     }
 
     .member-card:hover {
         transform: translateY(-10px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        border-color: #E14B1F;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary);
+    }
+    
+    .member-card:hover .profile-img {
+        transform: scale(1.1);
     }
 
     @media (max-width: 1100px) {

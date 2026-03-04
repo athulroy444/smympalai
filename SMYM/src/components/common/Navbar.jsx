@@ -25,7 +25,7 @@ function AppNavbar() {
   return (
     <>
       <TopBar />
-      <Navbar expand="lg" className="sticky-top glass-navbar" style={{ padding: '15px 0' }}>
+      <Navbar expand="lg" className="sticky-top glass-navbar" style={{ padding: '15px 0', zIndex: 10000 }}>
         <Container>
           <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
             <img
@@ -73,6 +73,35 @@ function AppNavbar() {
               overflow-y: auto;
               min-width: 220px;
             }
+            
+            /* Aggressive fix for visibility - Force everything to be visible */
+            .glass-navbar, .sticky-top, .navbar, .container, .navbar-collapse {
+              overflow: visible !important;
+              z-index: 10000 !important;
+            }
+            
+            .dropdown-menu {
+              z-index: 10001 !important;
+              display: none;
+              background: #ffffff !important;
+              border: 1px solid rgba(0,0,0,0.1) !important;
+              box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+              opacity: 1 !important;
+              visibility: visible !important;
+            }
+            .dropdown-menu.show {
+              display: block !important;
+            }
+            .nav-item.dropdown {
+              position: relative !important;
+              overflow: visible !important;
+            }
+            
+            /* Ensure the navbar itself doesn't clip children */
+            nav.navbar {
+              height: auto !important;
+              min-height: 80px;
+            }
           `}</style>
 
           <Navbar.Toggle aria-controls="navbarScroll" />
@@ -80,7 +109,6 @@ function AppNavbar() {
             <Nav
               className="ms-auto my-2 my-lg-0 fw-bold text-uppercase"
               style={{ fontSize: '0.9rem', gap: '15px' }}
-              navbarScroll
             >
               <Nav.Link as={Link} to="/" className="nav-link-custom">Home</Nav.Link>
 
@@ -159,6 +187,7 @@ function AppNavbar() {
               )}
             </div>
           </Navbar.Collapse>
+
         </Container>
       </Navbar>
     </>

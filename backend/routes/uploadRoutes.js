@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
     fileFilter: (req, file, cb) => {
         const filetypes = /jpeg|jpg|png|webp/;
         const mimetype = filetypes.test(file.mimetype);
@@ -36,23 +36,38 @@ const upload = multer({
     }
 });
 
+const uploadMiddleware = upload.single('image');
+
 // Route: POST /api/upload
-router.post('/', upload.single('image'), (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ message: "No file uploaded" });
+router.post('/', (req, res) => {
+    uploadMiddleware(req, res, (err) => {
+        if (err instanceof multer.MulterError) {
+            // A Multer error occurred when uploading.
+            console.error("Multer Error:", err);
+            return res.status(400).json({ message: `Upload error: ${err.message}` });
+        } else if (err) {
+            // An unknown error occurred when uploading.
+            console.error("Unknown Upload Error:", err);
+            return res.status(400).json({ message: err.message });
         }
 
-        // Return the file URL
-        const fileUrl = `/uploads/${req.file.filename}`;
-        res.status(201).json({
-            message: "File uploaded successfully",
-            url: fileUrl
-        });
-    } catch (err) {
-        console.error("Upload error:", err);
-        res.status(500).json({ message: "Server Error during upload" });
-    }
+        // Everything went fine.
+        try {
+            if (!req.file) {
+                return res.status(400).json({ message: "No file uploaded" });
+            }
+
+            // Return the file URL
+            const fileUrl = `/uploads/${req.file.filename}`;
+            res.status(201).json({
+                message: "File uploaded successfully",
+                url: fileUrl
+            });
+        } catch (err) {
+            console.error("Upload process error:", err);
+            res.status(500).json({ message: "Server Error during upload processing" });
+        }
+    });
 });
 
 module.exports = router;

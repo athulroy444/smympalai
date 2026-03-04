@@ -16,22 +16,25 @@ function HeroCarousel() {
   const slidesToDisplay = heroSlides.length > 0 ? heroSlides : defaultSlides;
 
   return (
-    <Carousel fade interval={5000} pause={false}>
+    <Carousel fade interval={5000} pause={false} style={{ zIndex: 0 }} indicators={true}>
       {slidesToDisplay.map((slide, idx) => (
         <Carousel.Item key={slide.id || idx}>
-          <div className="hero-carousel-item">
+          <div className="hero-carousel-item" style={{ zIndex: 0 }}>
             <div className="hero-overlay" />
             <img
               className="hero-img d-block w-100"
               src={slide.image_url}
               alt={slide.title}
             />
-            {(slide.title || slide.subtitle) && (
-              <Carousel.Caption className="text-start pb-5 mb-5 ps-4">
-                <h1 className="fw-bold display-3 slide-in-top">{slide.title}</h1>
-                <p className="lead slide-in-bottom">{slide.subtitle}</p>
-              </Carousel.Caption>
-            )}
+            <Carousel.Caption className="text-start d-flex flex-column justify-content-center h-100 pb-5 ps-4 ps-md-5" style={{ zIndex: 2, top: 0, bottom: 0 }}>
+              {/* <span className="section-subtitle text-white border-start border-4 border-primary ps-3 mb-4">Eparchy of Palai</span> */}
+              {/* <h1 className="hero-title fw-extrabold">{slide.title || "Syro Malabar Youth Movement"}</h1> */}
+              {/* <p className="hero-subtitle lead mb-5">{slide.subtitle || "Leading the youth through faith, leadership, and service."}</p> */}
+              <div className="d-flex gap-3 mt-4">
+                {/* <button className="btn-premium">Join Movement</button> */}
+                {/* <button className="btn-outline-premium border-white text-white">Learn More</button> */}
+              </div>
+            </Carousel.Caption>
           </div>
         </Carousel.Item>
       ))}

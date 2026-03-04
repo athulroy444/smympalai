@@ -102,76 +102,87 @@ function NewsSection() {
   };
 
   return (
-    <div className="section-padding">
+    <div className="section-padding" style={{ backgroundColor: '#ffffff' }}>
       <Container>
-        <div className="text-center mb-5 position-relative">
-          <h5 className="text-primary text-uppercase fw-bold mb-2">Updates</h5>
-          <h2 className="mb-3">Latest News & Events</h2>
-          <div style={{ width: '60px', height: '3px', background: '#E14B1F', margin: '0 auto' }}></div>
+        <div className="text-center mb-5 pb-4 position-relative">
+          <span className="section-subtitle">Stay Updated</span>
+          <h2 className="section-title">Latest News & Events</h2>
+          <div style={{ width: '80px', height: '4px', background: 'var(--primary)', margin: '0 auto' }}></div>
 
           {isAdmin && (
-            <div className="position-absolute top-0 end-0">
-              <Button variant="primary" onClick={handleAddNew}>
-                <Plus size={20} className="me-1" /> Add Item
-              </Button>
+            <div className="mt-4">
+              <button className="btn-premium" onClick={handleAddNew}>
+                <Plus size={24} /> Post New Update
+              </button>
             </div>
           )}
         </div>
 
-        <Row>
+        <Row className="g-4">
           {combinedList.length === 0 ? (
-            <div className="text-center w-100 py-5">No news or events found.</div>
+            <div className="text-center w-100 py-5">
+              <div className="glass-card p-5 d-inline-block">
+                <Spinner animation="grow" variant="primary" className="mb-3" />
+                <p className="text-muted">Waiting for exciting updates...</p>
+              </div>
+            </div>
           ) : (
             combinedList.slice(0, 4).map((item) => (
-              <Col key={`${item.type}-${item.id}`} lg={3} md={6} className="mb-4">
-                <Card className="h-100 shadow-sm border-0 position-relative">
+              <Col key={`${item.type}-${item.id}`} lg={3} md={6}>
+                <div className="news-card h-100 position-relative">
                   {isAdmin && (
-                    <div className="position-absolute top-0 end-0 p-2 z-1">
-                      <Button variant="light" size="sm" className="me-1 shadow-sm text-primary" onClick={() => handleEdit(item)}>
-                        <Pencil size={12} />
-                      </Button>
-                      <Button variant="light" size="sm" className="shadow-sm text-danger" onClick={() => handleDelete(item.id, item.type)}>
-                        <Trash size={12} />
-                      </Button>
+                    <div className="position-absolute top-0 end-0 p-3 z-3 d-flex gap-2">
+                      <button className="btn btn-sm btn-white glass-card border-0 p-2" onClick={() => handleEdit(item)}>
+                        <Pencil size={14} className="text-primary" />
+                      </button>
+                      <button className="btn btn-sm btn-white glass-card border-0 p-2" onClick={() => handleDelete(item.id, item.type)}>
+                        <Trash size={14} className="text-danger" />
+                      </button>
                     </div>
                   )}
 
-                  <Card.Img
-                    variant="top"
-                    src={getImageUrl(item.image_url)}
-                    style={{
-                      height: '200px',
-                      objectFit: item.image_url ? 'cover' : 'contain',
-                      padding: item.image_url ? '0' : '20px',
-                      backgroundColor: '#f9f9f9'
-                    }}
-                  />
-                  <Card.Body className="d-flex flex-column">
-                    <div className="d-flex align-items-center mb-2 text-muted small">
-                      <Calendar size={14} className="me-2 text-primary" />
-                      {item.event_date ? new Date(item.event_date).toLocaleDateString() : 'Date TBD'}
-                      <span className={`ms-auto badge ${item.type === 'news' ? 'bg-info' : 'bg-warning text-dark'}`}>
-                        {item.type === 'news' ? 'News' : 'Event'}
+                  <div className="news-img-box">
+                    <img
+                      src={getImageUrl(item.image_url)}
+                      alt={item.title}
+                      className="news-img w-100 h-100 object-fit-cover"
+                    />
+                    <div className="position-absolute bottom-0 start-0 p-3 w-100">
+                      <span className={`badge ${item.type === 'news' ? 'bg-primary' : 'bg-dark'} px-3 py-2 rounded-pill shadow-sm`}>
+                        {item.type === 'news' ? 'NEWS' : 'EVENT'}
                       </span>
                     </div>
-                    <Card.Title className="fw-bold mb-3 fs-6">{item.title}</Card.Title>
-                    <Card.Text className="text-secondary small mb-4 flex-grow-1">
-                      {item.type === 'news' ? truncate(item.description, 100) : (
-                        <span><GeoAlt className="me-1" /> {item.location}</span>
+                  </div>
+
+                  <div className="p-4 d-flex flex-column h-100">
+                    <div className="d-flex align-items-center mb-3 text-muted small fw-600">
+                      <Calendar size={14} className="me-2 text-primary" />
+                      {item.event_date ? new Date(item.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Upcoming'}
+                    </div>
+
+                    <h5 className="fw-bold mb-3 text-dark" style={{ lineHeight: '1.4' }}>{item.title}</h5>
+
+                    <div className="text-muted small mb-4 flex-grow-1" style={{ opacity: 0.8 }}>
+                      {item.type === 'news' ? truncate(item.description, 90) : (
+                        <div className="d-flex align-items-center">
+                          <GeoAlt className="me-2 text-primary" />
+                          <span className="text-truncate">{item.location}</span>
+                        </div>
                       )}
-                    </Card.Text>
-                    <a href="#" className="text-primary fw-bold text-decoration-none small d-flex align-items-center mt-auto">
-                      Read More <ArrowRight className="ms-1" />
+                    </div>
+
+                    <a href="#" className="btn-outline-premium btn-sm text-center text-decoration-none mt-auto">
+                      View Details <ArrowRight size={14} className="ms-1" />
                     </a>
-                  </Card.Body>
-                </Card>
+                  </div>
+                </div>
               </Col>
             ))
           )}
         </Row>
 
-        <div className="text-center mt-4">
-          <Button variant="outline-primary">View All Updates</Button>
+        <div className="text-center mt-5">
+          <button className="btn-premium btn-lg">Explore All Updates</button>
         </div>
 
         <Modal show={showModal} onHide={() => setShowModal(false)} centered>

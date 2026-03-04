@@ -31,54 +31,61 @@ function KarmaRekha() {
     };
 
     return (
-        <section className="py-5 text-white" style={{ background: 'linear-gradient(45deg, #1a237e 0%, #283593 100%)' }}>
-            <Container>
-                <div className="position-relative p-4 border border-light rounded" style={{ background: 'rgba(255,255,255,0.1)' }}>
-                    {isAdmin && (
-                        <Button
-                            variant="light"
-                            size="sm"
-                            className="position-absolute top-0 end-0 m-3 text-primary fw-bold"
-                            onClick={openEdit}
-                        >
-                            <Pencil className="me-1" /> Edit
-                        </Button>
-                    )}
+        <>
+            <section className="section-padding" style={{ background: '#f8fafc' }}>
+                <Container>
+                    <div className="glass-card p-5 overflow-hidden position-relative" style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)', border: 'none' }}>
+                        {/* Decorative elements */}
+                        <div className="position-absolute top-0 end-0 p-5 mt-5 opacity-10">
+                            <FileEarmarkPdf size={200} className="text-white" />
+                        </div>
 
-                    <Row className="align-items-center text-center text-md-start">
-                        <Col md={8}>
-                            <h2 className="fw-bold mb-2">കർമ്മരേഖ</h2>
-                            <h4 className="mb-3 text-warning">{karmaRekha?.title || 'Karma Rekha 2025'}</h4>
-                            <p className="mb-0 text-white-50">
-                                The official action plan and guidelines for SMYM Eparchy of Palai.
-                                Download the digital copy to stay updated with our mission and vision.
-                            </p>
-                        </Col>
-                        <Col md={4} className="text-center mt-3 mt-md-0">
-                            <Button
-                                variant="warning"
-                                size="lg"
-                                href={karmaRekha?.link || '#'}
-                                target="_blank"
-                                download="Darshanam.pdf"
-                                className="fw-bold px-4 py-3 rounded-pill shadow"
+                        {isAdmin && (
+                            <button
+                                className="btn btn-sm glass-card border-0 position-absolute top-0 end-0 m-4 px-3 py-2 text-white fw-bold"
+                                style={{ background: 'rgba(255,255,255,0.1)' }}
+                                onClick={openEdit}
                             >
-                                <Download className="me-2" /> Download PDF
-                            </Button>
-                        </Col>
-                    </Row>
-                </div>
-            </Container>
+                                <Pencil size={14} className="me-2" /> Modify Content
+                            </button>
+                        )}
+
+                        <Row className="align-items-center position-relative z-1 g-4">
+                            <Col lg={8} className="text-center text-lg-start">
+                                <span className="section-subtitle text-primary-light mb-2">Annual Action Plan</span>
+                                <h2 className="display-4 fw-800 text-white mb-3" style={{ fontFamily: "'Outfit', sans-serif" }}>കർമ്മരേഖ</h2>
+                                <h4 className="fw-bold text-accent mb-4" style={{ letterSpacing: '2px' }}>{karmaRekha?.title || 'Karma Rekha 2025-26'}</h4>
+                                <p className="text-white opacity-75 lead mb-0" style={{ maxWidth: '600px' }}>
+                                    The strategic roadmap and official guidelines for SMYM Eparchy of Palai.
+                                    Our mission in action, documented for every youth leader.
+                                </p>
+                            </Col>
+                            <Col lg={4} className="text-center">
+                                <a
+                                    href={karmaRekha?.link || '#'}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    download="KarmaRekha.pdf"
+                                    className="btn-premium btn-lg py-3 px-5 shadow-2xl"
+                                    style={{ background: 'white', color: 'var(--primary)', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}
+                                >
+                                    <Download size={22} className="me-3" /> Download PDF
+                                </a>
+                            </Col>
+                        </Row>
+                    </div>
+                </Container>
+            </section>
 
             {/* Edit Modal */}
             <Modal show={showModal} onHide={() => setShowModal(false)} centered>
                 <Modal.Header closeButton>
-                    <Modal.Title>Update Karma Rekha</Modal.Title>
+                    <Modal.Title className="fw-bold">Update Karma Rekha</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Form.Group className="mb-3">
-                            <Form.Label>Title (Year)</Form.Label>
+                            <Form.Label className="small fw-bold">Title (Year)</Form.Label>
                             <Form.Control
                                 type="text"
                                 value={title}
@@ -86,7 +93,7 @@ function KarmaRekha() {
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">
-                            <Form.Label>PDF Link (URL)</Form.Label>
+                            <Form.Label className="small fw-bold">PDF Link (URL)</Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder="https://..."
@@ -101,7 +108,7 @@ function KarmaRekha() {
                     <Button variant="primary" onClick={handleSave}>Save Changes</Button>
                 </Modal.Footer>
             </Modal>
-        </section>
+        </>
     );
 }
 

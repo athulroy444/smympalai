@@ -7,6 +7,7 @@ import NewsSection from "../components/home/NewsSection";
 import SecretariatPage from "../components/home/ROOPATHA";
 import SyndicatePage from "../components/home/Syndicate";
 import SportsTeaser from "../components/home/SportsTeaser";
+import MissionVision from "../components/home/MissionVision";
 
 
 function Home() {
@@ -15,7 +16,9 @@ function Home() {
         return (
             <>
                 <HeroCarousel />
+                <BrowseForonaSection />
                 <HistorySection />
+                <MissionVision />
                 <SecretariatPage />
                 <SyndicatePage />
                 <KarmaRekha />

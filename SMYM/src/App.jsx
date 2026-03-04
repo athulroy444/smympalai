@@ -34,7 +34,7 @@ function App() {
           {/* Navbar shows on all pages */}
           <AppNavbar />
           {console.log("App: Navbar rendered")}
-          <main style={{ minHeight: '80vh' }}>
+          <main style={{ minHeight: '80vh', position: 'relative', zIndex: 1 }}>
             <Routes>
               {console.log("App: Routes rendering")}
               {/* Main Pages */}

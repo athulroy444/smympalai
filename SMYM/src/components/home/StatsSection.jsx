@@ -12,19 +12,23 @@ function StatsSection() {
     ];
 
     return (
-        <div className="section-padding" style={{ backgroundColor: 'rgba(225, 75, 31, 0.85)', backdropFilter: "blur(10px)", color: 'white' }}>
+        <div className="section-padding" style={{ background: 'linear-gradient(150deg, var(--secondary) 0%, #e1f00cff 100%)', color: 'white' }}>
             <Container>
-                <Row className="text-center">
-                    <Col xs={12} className="mb-4">
-                        <h2 className="text-white fw-bold text-uppercase">Eparchy at a Glance</h2>
-                        <div style={{ width: '60px', height: '3px', background: 'white', margin: '0 auto' }}></div>
-                    </Col>
+                <div className="text-center mb-5 pb-4">
+                    <span className="section-subtitle text-primary">Our Impact</span>
+                    <h2 className="section-title text-white">Eparchy at a Glance</h2>
+                    <div style={{ width: '80px', height: '4px', background: 'var(--primary)', margin: '0 auto' }}></div>
+                </div>
+
+                <Row className="g-4">
                     {stats.map((stat, idx) => (
-                        <Col key={idx} md={3} sm={6} className="mb-4 mb-md-0">
-                            <div className="p-3">
-                                <div className="mb-3 text-white-50">{stat.icon}</div>
-                                <h3 className="fw-bold mb-1 display-6 text-white">{stat.count}</h3>
-                                <p className="text-uppercase fw-semibold small letter-spacing-1">{stat.label}</p>
+                        <Col key={idx} md={3} sm={6}>
+                            <div className="glass-card stat-box h-100 p-4" style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)' }}>
+                                <div className="mb-4 text-primary d-inline-block p-3 rounded-circle" style={{ backgroundColor: 'rgba(225, 75, 31, 0.1)' }}>
+                                    {stat.icon}
+                                </div>
+                                <h3 className="stat-number fw-800 text-white mb-2" style={{ fontFamily: "'Outfit', sans-serif" }}>{stat.count}</h3>
+                                <p className="stat-label text-white opacity-75 small">{stat.label}</p>
                             </div>
                         </Col>
                     ))}
