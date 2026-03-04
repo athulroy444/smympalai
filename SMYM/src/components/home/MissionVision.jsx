@@ -1,25 +1,27 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Eye, Bullseye, Compass } from 'react-bootstrap-icons';
+import visionImg from '../../assets/vision_orange.jpg';
+import mottoImg from '../../assets/motto_blue.png';
 
 const MissionVision = () => {
     const pillars = [
         {
-            title: "Our Vision",
-            desc: "To empower youth to be vibrant witnesses of the Gospel and proactive leaders in the Church and society through spiritual, social, and cultural integration.",
-            icon: <Eye size={40} className="text-primary" />,
+            title: "",
+            desc: "",
+            icon: <div className="overflow-hidden rounded-lg shadow-sm w-100" style={{ height: '300px' }}><img src={visionImg} className="w-100 h-100 object-contain" alt="Vision" /></div>,
             color: "#fff"
         },
         {
             title: "Our Mission",
             desc: "To create a unified platform for the youth of Syro-Malabar Church, fostering their holistic development and involving them in the mission of the Church.",
-            icon: <Bullseye size={40} className="text-primary" />,
+            icon: <Bullseye size={60} className="text-primary" />,
             color: "#f8fafc"
         },
         {
-            title: "Our Motto",
-            desc: "\"Youth in the Society for God's Kingdom.\" We strive to build a just and humane society based on Gospel values and the teachings of the Church.",
-            icon: <Compass size={40} className="text-primary" />,
+            title: "",
+            desc: "",
+            icon: <div className="overflow-hidden rounded-lg shadow-sm w-100" style={{ height: '300px' }}><img src={mottoImg} className="w-100 h-100 object-contain" alt="Motto" /></div>,
             color: "#fff"
         }
     ];
@@ -36,14 +38,16 @@ const MissionVision = () => {
                 <Row className="g-4">
                     {pillars.map((p, i) => (
                         <Col key={i} lg={4}>
-                            <div className="glass-card stat-box h-100 p-5 d-flex flex-column align-items-center text-center">
-                                <div className="mb-4 p-4 rounded-circle bg-light shadow-sm d-inline-flex align-items-center justify-content-center" style={{ width: '100px', height: '100px' }}>
+                            <div className="glass-card stat-box h-100 p-4 d-flex flex-column align-items-center justify-content-center text-center">
+                                <div className="mb-0 w-100 d-inline-flex align-items-center justify-content-center">
                                     {p.icon}
                                 </div>
-                                <h3 className="fw-bold mb-3">{p.title}</h3>
-                                <p className="text-muted leading-relaxed" style={{ fontSize: '1.05rem', opacity: 0.8 }}>
-                                    {p.desc}
-                                </p>
+                                {p.title && <h3 className="fw-bold mb-3 mt-4">{p.title}</h3>}
+                                {p.desc && (
+                                    <p className="text-muted leading-relaxed mb-0" style={{ fontSize: '1.05rem', opacity: 0.8 }}>
+                                        {p.desc}
+                                    </p>
+                                )}
                             </div>
                         </Col>
                     ))}
